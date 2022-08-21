@@ -1,6 +1,4 @@
 import json
-from datetime import datetime
-import pytz
 import requests
 from bs4 import BeautifulSoup
 
@@ -73,9 +71,9 @@ class sdk:
                 successful = True
                 break
         if not successful:
-            exit("Kunne ikke finde elev id. Rapporter venligst dette på Github")
+            raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
 
-    def skema(self, retry=False):
+    def skema(self, retry=False, uge=None, år=None):
         headers = {
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'accept-encoding': 'gzip, deflate, br',
@@ -91,29 +89,22 @@ class sdk:
             'upgrade-insecure-requests': '1',
             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36',
         }
-        resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={self.elevId}&showtype=1",
-                            headers=headers)
+        if uge == None and år == None:
+            resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={self.elevId}&showtype=1", headers=headers)
+        elif uge != None and år != None:
+            resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={self.elevId}&showtype=1&week={uge}{år}", headers=headers)
+        else:
+            raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
+
         soup = BeautifulSoup(resp.text, "html.parser")
 
         successful = False
         skema = soup.find_all("a", class_="s2skemabrik")
-        for modul in skema:
-            modulDetailer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
+        if len(skema) > 0:
+            successful = True
 
-            tidspunkt = modulDetailer[-4]
-            hold = modulDetailer[-3].replace("Hold: ", "")
-            lærer = modulDetailer[-2].replace("Lærere: ", "").replace("Lærer: ", "")
-            lokale = modulDetailer[-1].replace("Lokale: ", "")
-
-            unixTidspunkt = int(datetime.strptime(tidspunkt.split(" til")[0], "%d/%m-%Y %H:%M").timestamp())
-            danskUnixTid = int(datetime.now(pytz.timezone('Europe/Copenhagen')).timestamp())
-
-            tidTilTime = unixTidspunkt - danskUnixTid
-            if tidTilTime > 0:
-                successful = True
-                break
         if successful:
-            return {"tidspunkt": tidspunkt, "hold": hold, "lærer": lærer, "lokale": lokale}
+            return skema
         elif not retry:
             self.login()
             return self.skema(retry=True)
