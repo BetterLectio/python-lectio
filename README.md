@@ -1,6 +1,6 @@
 # Python-Lectio
 En SDK til gymnasie siden Lectio  
-Dataen bliver returneret ud som JSON
+Dataen bliver returneret som JSON
 
 # Installation
 ```
@@ -32,12 +32,13 @@ Returneret format:
 ```json
 [
   {
+    "navn": "...",
     "tidspunkt": "...",
     "hold": "...",
     "lærer": "...",
-    "andet": "...",
-    "absid": "..."
-  },
+    "lokale": "...",
+    "andet": "..."
+    },
   ...
 ]
 ```

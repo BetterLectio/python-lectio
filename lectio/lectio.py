@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 import requests
 import re
 from bs4 import BeautifulSoup
@@ -63,8 +65,7 @@ class sdk:
             'upgrade-insecure-requests': '1',
             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36',
         }
-        resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/login.aspx", data=payload,
-                                 headers=headers)
+        resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/login.aspx", data=payload, headers=headers)
         soup = BeautifulSoup(resp.text, "html.parser")
 
         successful = False
@@ -81,11 +82,9 @@ class sdk:
             elevId = self.elevId
 
         if uge == None and år == None:
-            resp = self.session.get(
-                f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
+            resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
         elif uge != None and år != None:
-            resp = self.session.get(
-                f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}&week={uge}{år}")
+            resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}&week={uge}{år}")
         else:
             raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
 
@@ -94,26 +93,43 @@ class sdk:
         successful = False
         skema = []
         i = 0
+
+        renameDictionary = {
+            "Lærere": "Lærer",
+            "Lokaler": "Lokale"
+        }
+
         for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
             if i != 0:
                 dag = BeautifulSoup(str(dag), "html.parser")
                 for modul in dag.find_all("a", class_="s2skemabrik"):
-                    modulDetailer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
+                    modulDetaljer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
 
                     modulDict = {
-                        "tidspunkt": modulDetailer[-4],
-                        "hold": modulDetailer[-3].replace("Hold: ", ""),
-                        "lærer": modulDetailer[-2].replace("Lærere: ", "").replace("Lærer: ", ""),
-                        "lokale": modulDetailer[-1].replace("Lokale: ", "")
+                        "navn": None,
+                        "tidspunkt": None,
+                        "hold": None,
+                        "lærer": None,
+                        "lokale": None,
+                        "andet": None
                     }
+                    for modulDetalje in modulDetaljer:
+                        if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
+                            if (navn := modulDetalje.split(": ")[0]) in renameDictionary:
+                                navn = renameDictionary[navn]
+
+                            modulDict[navn.lower()] = value
+                        else:
+                            try:
+                                int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0], "%d/%m-%Y %H:%M").timestamp())
+                                modulDict["tidspunkt"] = modulDetalje
+                            except Exception:
+                                modulDict["navn"] = modulDetalje.split(": ")[0]
 
                     try:
                         modulDict["andet"] = modul["data-additionalinfo"].split("\n\n")[1]
                     except Exception:
-                        modulDict["andet"] = None
                         pass
-
-                    modulDict["absid"] = re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", "")
 
                     skema.append(modulDict)
             i += 1
