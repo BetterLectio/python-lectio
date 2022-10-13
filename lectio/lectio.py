@@ -77,6 +77,61 @@ class sdk:
         if not successful:
             raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
 
+    def lektier(self, elevId=None):
+        if elevId == None:
+            elevId = self.elevId
+
+        resp = self.session.get(f"https://www.lectio.dk/lectio/681/material_lektieoversigt.aspx?elevid={elevId}")
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        lektier = []
+
+        renameDictionary = {
+            "Lærere": "Lærer",
+            "Lokaler": "Lokale"
+        }
+
+        for tr in soup.find_all("tr"):
+            modul = tr.find("a", class_="s2skemabrik")
+            modulDetaljer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
+
+            modulDict = {
+                "navn": None,
+                "tidspunkt": None,
+                "hold": None,
+                "lærer": None,
+                "lokale": None,
+                "absid": re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", "")
+            }
+            for modulDetalje in modulDetaljer:
+                if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
+                    if (navn := modulDetalje.split(": ")[0]) in renameDictionary:
+                        navn = renameDictionary[navn]
+
+                    modulDict[navn.lower()] = value
+                else:
+                    try:
+                        int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0],
+                                              "%d/%m-%Y %H:%M").timestamp())
+                        modulDict["tidspunkt"] = modulDetalje
+                    except Exception:
+                        modulDict["navn"] = modulDetalje.split(": ")[0]
+
+            lektie = {
+                "dato": tr.find("th").get("b"),
+                "aktivitet": modulDict,
+                "note": tr.find_all("td")[1].text,
+                "lektier": {
+                    "beskrivelse": tr.find_all("a")[1].text,
+                    "link": tr.find_all("a")[1].get("href")
+                }
+            }
+
+            lektier.append(lektie)
+
+        return lektier
+
     def skema(self, retry=False, uge=None, år=None, elevId=None):
         if elevId == None:
             elevId = self.elevId
@@ -84,6 +139,10 @@ class sdk:
         if uge == None and år == None:
             resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
         elif uge != None and år != None:
+            uge = str(uge)
+            år = str(år)
+            if len(uge) == 1:
+                uge = "0" + uge
             resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}&week={uge}{år}")
         else:
             raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
@@ -111,6 +170,7 @@ class sdk:
                         "hold": None,
                         "lærer": None,
                         "lokale": None,
+                        "absid": re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", ""),
                         "andet": None
                     }
                     for modulDetalje in modulDetaljer:

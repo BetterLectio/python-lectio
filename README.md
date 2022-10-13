@@ -27,6 +27,7 @@ Se dit skema for en hvilken som helst uge. Hvis du ikke skriver uge/år på tage
 ```python
 skema = client.skema()
 skemaSpecifikUge = client.skema(uge=35, år=2022)
+lektierForSpecifikElev = client.lektier(elevId="...")
 ```
 Returneret format:
 ```json
@@ -37,11 +38,42 @@ Returneret format:
     "hold": "...",
     "lærer": "...",
     "lokale": "...",
+    "absid": "...",
     "andet": "..."
     },
   ...
 ]
 ```
+
+## Lektier
+Få dine lektier for de kommende 14 dage
+```python
+lektier = client.lektier()
+lektierForSpecifikElev = client.lektier(elevId="...")
+```
+Returneret format:
+```json
+[
+    {
+        "dato": "...",
+        "aktivitet": {
+            "navn": "...",
+            "tidspunkt": "...",
+            "hold": "...",
+            "lærer": "...",
+            "lokale": "...",
+            "absid": "..."
+            },
+            "note": "...",
+            "lektier": {
+                "beskrivelse": "...",
+                "link": "..."
+        }
+    },
+    ...
+]
+```
+
 ## Elever
 Få alle elever på skolen med et bestemt forbogstav.
 ```python
