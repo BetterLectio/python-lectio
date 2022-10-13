@@ -32,16 +32,16 @@ lektierForSpecifikElev = client.lektier(elevId="...")
 Returneret format:
 ```json
 [
-  {
-    "navn": "...",
-    "tidspunkt": "...",
-    "hold": "...",
-    "lærer": "...",
-    "lokale": "...",
-    "absid": "...",
-    "andet": "..."
+    {
+        "navn": "...",
+        "tidspunkt": "...",
+        "hold": "...",
+        "lærer": "...",
+        "lokale": "...",
+        "absid": "...",
+        "andet": "..."
     },
-  ...
+    ...
 ]
 ```
 
@@ -63,11 +63,11 @@ Returneret format:
             "lærer": "...",
             "lokale": "...",
             "absid": "..."
-            },
-            "note": "...",
-            "lektier": {
-                "beskrivelse": "...",
-                "link": "..."
+        },
+        "note": "...",
+        "lektier": {
+            "beskrivelse": "...",
+            "link": "..."
         }
     },
     ...
@@ -82,11 +82,11 @@ elever = client.elever(forbogstav="A")
 Returneret format:
 ```json
 [
-  {
-    "navn": "...",
-    "elevid": "..."
-  },
-  ...
+    {
+        "navn": "...",
+        "elevid": "..."
+    },
+    ...
 ]
 ```
 
