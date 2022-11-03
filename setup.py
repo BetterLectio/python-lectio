@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 DESCRIPTION = 'En SDK til gymnasie siden Lectio'
 long_description = (Path(__file__).parent / "README.md").read_text()
 
@@ -18,7 +18,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(),
     install_requires=["requests", "beautifulsoup4"],
-    keywords=['python', 'lectio', 'sdk', 'gymnasie'],
+    keywords=['python', 'lectio', 'sdk', 'gymnasie', 'gymnasium'],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",

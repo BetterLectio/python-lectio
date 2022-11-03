@@ -1,20 +1,29 @@
 import json
-from datetime import datetime
-
 import requests
 import re
+import base64
 from bs4 import BeautifulSoup
-
+from datetime import datetime
 
 class sdk:
-    def __init__(self, brugernavn, adgangskode, skoleId):
-        self.brugernavn = brugernavn
-        self.adgangskode = adgangskode
-        self.skoleId = skoleId
-
+    def __init__(self, brugernavn, adgangskode, skoleId, base64Cookie=None):
         self.session = requests.session()
 
-        self.login()
+        if base64Cookie == None:
+            self.brugernavn = brugernavn
+            self.adgangskode = adgangskode
+            self.skoleId = skoleId
+
+            self.login()
+        else:
+            cookie = json.loads(base64.b64decode(base64Cookie))
+            self.skoleId = cookie["LastLoginExamno"]
+
+            for identifier, value in cookie.items():
+                self.session.cookies.set(identifier, value, domain="lectio.dk")
+
+            self.elevId = self.fåSkoleId()
+
 
     def login(self):
         headers = {
@@ -76,6 +85,16 @@ class sdk:
                 break
         if not successful:
             raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
+
+    def fåSkoleId(self):
+        resp = self.session.get("https://www.lectio.dk/lectio/681/forside.aspx")
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        for meta in soup.find_all({"meta": {"name": "msapplication-starturl"}}):
+            if f"/lectio/{self.skoleId}/forside.aspx?" in str(meta.get("content")):
+                return meta.get("content").split("?elevid=")[1]
+
+        raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
 
     def lektier(self, elevId=None):
         if elevId == None:
