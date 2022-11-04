@@ -96,6 +96,7 @@ class sdk:
 
         raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
 
+
     def lektier(self, elevId=None):
         if elevId == None:
             elevId = self.elevId
@@ -224,6 +225,16 @@ class sdk:
         else:
             return False
 
+    def fåElev(self, elevId):
+        resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        elev = {
+            "navn": soup.find("div", {"class": "maintitle"}).text.replace(" - Skema", ""),
+            "billede": soup.find("img", {"id": "s_m_HeaderContent_picctrlthumbimage"}).get("src")
+        }
+
+        return elev
     def elever(self, forbogstav, retry=False):
         elever = []
 
