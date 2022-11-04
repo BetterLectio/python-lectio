@@ -230,7 +230,7 @@ class sdk:
         soup = BeautifulSoup(resp.text, "html.parser")
 
         elev = {
-            "navn": soup.find("div", {"class": "maintitle"}).text.replace(" - Skema", ""),
+            "navn": soup.find("div", {"class": "maintitle"}).text.replace("Eleven ", "").replace(" - Skema", ""),
             "billede": soup.find("img", {"id": "s_m_HeaderContent_picctrlthumbimage"}).get("src")
         }
 
