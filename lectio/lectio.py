@@ -172,7 +172,8 @@ class sdk:
         skema = {
             "modulTider": {},
             "ugeDage": [],
-            "moduler": []
+            "moduler": [],
+            "dagsNoter": {}
         }
 
         for modulTid in soup.find_all("div", {"class": "s2module-info"}):
@@ -181,6 +182,13 @@ class sdk:
         for dag in soup.find("tr", {"class": "s2dayHeader"}).find_all("td"):
             if dag.text != "":
                 skema["ugeDage"].append(dag.text)
+
+        i = 0
+        for dagsNoter in soup.find_all("td", {"class": "s2infoHeader s2skemabrikcontainer"}):
+            skema["dagsNoter"][skema["ugeDage"][i]] = []
+            for dagsNote in dagsNoter.find_all("a"):
+                skema["dagsNoter"][skema["ugeDage"][i]].append(dagsNote.text.lstrip())
+            i += 1
 
         successful = False
         i = 0
