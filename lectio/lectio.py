@@ -169,8 +169,20 @@ class sdk:
 
         soup = BeautifulSoup(resp.text, "html.parser")
 
+        skema = {
+            "modulTider": {},
+            "ugeDage": [],
+            "moduler": []
+        }
+
+        for modulTid in soup.find_all("div", {"class": "s2module-info"}):
+            skema["modulTider"][modulTid.prettify().split("\n")[2].lstrip()] = modulTid.prettify().split("\n")[4].lstrip()
+
+        for dag in soup.find("tr", {"class": "s2dayHeader"}).find_all("td"):
+            if dag.text != "":
+                skema["ugeDage"].append(dag.text)
+
         successful = False
-        skema = []
         i = 0
 
         renameDictionary = {
@@ -211,7 +223,7 @@ class sdk:
                     except Exception:
                         pass
 
-                    skema.append(modulDict)
+                    skema["moduler"].append(modulDict)
             i += 1
 
         if len(skema) > 0:

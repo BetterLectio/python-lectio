@@ -31,18 +31,23 @@ lektierForSpecifikElev = client.lektier(elevId="...")
 ```
 Returneret format:
 ```json
-[
-    {
-        "navn": "...",
-        "tidspunkt": "...",
-        "hold": "...",
-        "lærer": "...",
-        "lokale": "...",
-        "absid": "...",
-        "andet": "..."
-    },
-    ...
-]
+{
+    "modulTider": {"1. modul": "8:15 - 9:15", "2. modul": "9:20 - 10:20"...},
+    "ugeDage": ["Mandag (31/10)", "Tirsdag (1/11)", "Onsdag (2/11)"...],
+    "moduler": [
+        {
+            "navn": "...",
+            "tidspunkt": "...",
+            "hold": "...",
+            "lærer": "...",
+            "lokale": "...",
+            "absid": "...",
+            "andet": "..."
+        },
+        ...
+    ],
+}
+
 ```
 
 ## Lektier
