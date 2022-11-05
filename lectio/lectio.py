@@ -173,7 +173,7 @@ class sdk:
             "modulTider": {},
             "ugeDage": [],
             "moduler": [],
-            "dagsNoter": {}
+            "dagsNoter": []
         }
 
         for modulTid in soup.find_all("div", {"class": "s2module-info"}):
@@ -185,9 +185,11 @@ class sdk:
 
         i = 0
         for dagsNoter in soup.find_all("td", {"class": "s2infoHeader s2skemabrikcontainer"}):
-            skema["dagsNoter"][skema["ugeDage"][i]] = []
+            skema["dagsNoter"].append({
+                skema["ugeDage"][i]: []
+            })
             for dagsNote in dagsNoter.find_all("a"):
-                skema["dagsNoter"][skema["ugeDage"][i]].append(dagsNote.text.lstrip())
+                skema["dagsNoter"][i][skema["ugeDage"][i]].append(dagsNote.text.lstrip())
             i += 1
 
         successful = False
