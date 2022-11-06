@@ -18,11 +18,11 @@ class sdk:
         else:
             cookie = json.loads(base64.b64decode(base64Cookie))
             self.skoleId = cookie["LastLoginExamno"]
+            self.elevId = cookie["LastLoginElevId"]
 
             for identifier, value in cookie.items():
                 self.session.cookies.set(identifier, value, domain="lectio.dk")
 
-            self.elevId = self.fåSkoleId()
 
 
     def login(self):
@@ -85,6 +85,12 @@ class sdk:
                 break
         if not successful:
             raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
+
+    def base64Cookie(self):
+        cookie = self.session.cookies.get_dict()
+        cookie["LastLoginElevId"] = self.elevId
+
+        return base64.b64encode(json.dumps(cookie).encode())
 
     def fåSkoleId(self):
         resp = self.session.get("https://www.lectio.dk/lectio/681/forside.aspx")
