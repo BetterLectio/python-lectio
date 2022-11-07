@@ -281,7 +281,10 @@ class sdk:
                     elementSoup = BeautifulSoup(element, "html.parser")
                     if elementSoup.text != "":
                         if (elementWithHref := elementSoup.find("a", href=True)) != None:
-                            modulDetaljer[last] += unicodedata.normalize("NFKD", f"[{elementSoup.text.rstrip().lstrip()}]({elementWithHref.get('href')})\n")
+                            href = elementWithHref.get('href')
+                            if href.startswith("/lectio/681"):
+                                href = "https://www.lectio.dk" + href
+                            modulDetaljer[last] += unicodedata.normalize("NFKD", f"[{elementSoup.text.rstrip().lstrip()}]({href})\n")
                         else:
                             modulDetaljer[last] += unicodedata.normalize("NFKD", elementSoup.text.rstrip().lstrip().replace(u"\xa0", u" ") + "\n")
 
