@@ -149,8 +149,8 @@ class sdk:
                 "aktivitet": modulDict,
                 "note": tr.find_all("td")[1].text,
                 "lektier": {
-                    "beskrivelse": tr.find_all("a")[1].text,
-                    "link": tr.find_all("a")[1].get("href")
+                    "beskrivelse": tr.find("td", {"class": "ls-homework"}).find("a").text,
+                    "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
                 }
             }
 
