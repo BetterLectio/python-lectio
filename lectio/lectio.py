@@ -319,6 +319,28 @@ class sdk:
 
         return modulDetaljer
 
+    def opgaver(self, elevId):
+        resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/OpgaverElev.aspx?elevid={elevId}")
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        opgaver = []
+        header = []
+
+        _header = soup.find("tr")
+        for th in _header.find_all("th"):
+            header.append(th.text.lower().replace("\xad", "-"))
+
+        for opgave in soup.find_all("tr")[1:]:
+            opgaveDict = {}
+
+            i = 0
+            for td in opgave.find_all("td"):
+                opgaveDict[header[i]] = td.text.lstrip()
+                i += 1
+
+            opgaver.append(opgaveDict)
+
+        return opgaver
     def fåElev(self, elevId):
         resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
         soup = BeautifulSoup(resp.text, "html.parser")
