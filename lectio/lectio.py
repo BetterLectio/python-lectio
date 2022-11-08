@@ -280,7 +280,7 @@ class sdk:
                     if elementSoup.text != "":
                         if (elementWithHref := elementSoup.find("a", href=True)) != None:
                             href = elementWithHref.get('href')
-                            if href.startswith("/lectio/681"):
+                            if href.startswith(f"/lectio/{self.skoleId}"):
                                 href = "https://www.lectio.dk" + href
                             modulDetaljer[last] += unicodedata.normalize("NFKD", f"[{elementSoup.text.rstrip().lstrip()}]({href})\n")
                         else:
