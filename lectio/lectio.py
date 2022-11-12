@@ -427,6 +427,17 @@ class sdk:
 
         return elev
 
+    def lærere(self):
+        resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/FindSkema.aspx?type=laerer")
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        lærere = []
+        for lærer in soup.find_all("a"):
+            if "data-lectiocontextcard" in str(lærer):
+                lærere.append({"navn": lærer.text, "lærerid": lærer["href"].split("laererid=")[1]})
+
+        return lærere
+
     def elever(self, forbogstav, retry=False):
         elever = []
 
