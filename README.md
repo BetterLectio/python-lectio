@@ -4,7 +4,7 @@ Dataen bliver returneret som JSON
 
 # Installation
 ```
-pip install python-lectio
+pip install python-lectio==0.0.20
 ```
 
 # Documentation
