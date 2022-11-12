@@ -7,7 +7,11 @@ Dataen bliver returneret som JSON
 pip install python-lectio
 ```
 
-# Documentation
+# Dokumentation
+Denne dokumentation er til den [gamle python-lectio](https://github.com/jona799t/python-lectio/tree/old) branch og vil måske ikke returnere/fungere som den gjorde før.  
+Hvis du vil bruge den [gamle python-lectio](https://github.com/jona799t/python-lectio/tree/old) kan du finde den [her](https://github.com/jona799t/python-lectio/tree/old).  
+  
+En dokumentation til den [nye python-lectio](https://github.com/jona799t/python-lectio/tree/main) er på vej.
 ## Login
 Login på Lectio igennem python
 ```python
