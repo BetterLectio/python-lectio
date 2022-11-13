@@ -53,5 +53,8 @@ class sdk:
     def fåElev(self, elevId):
         return _informationer.fåElev(self, elevId)
 
+    def fåBruger(self, brugerId):
+        return _informationer.fåBruger(self, brugerId)
+
     def fåFil(self, filUrl):
         return _filer.fåFil(self, filUrl)

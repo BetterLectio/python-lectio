@@ -16,6 +16,27 @@ def informationer(self):
 
     return informationerDict
 
+def fåBruger(self, brugerId):
+    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/contextcard/contextcard.aspx?lectiocontextcard={brugerId}")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    titel = soup.find("span").text
+
+    bruger = {
+        "navn": titel.split(" - ")[-1],
+        "pictureid": re.search("pictureid=\d+", soup.find("img").get("src")).group().replace("pictureid=", ""),
+        "type": titel.split(" - ")[0].lower()
+    }
+
+    if bruger["type"] == "lærer":
+        bruger["hold"] = {}
+        for hold in soup.find("table", {"class": "textTop"}).find_all("a"):
+            bruger["hold"][hold.text] = re.search("holdelementid=\d+", hold.get("href")).group().replace("holdelementid=", "")
+    else:
+        bruger["stamklasse"] = soup.find("table", {"class": "textTop"}).find_all("td")[1].text
+
+    return bruger
+
 def fåElev(self, elevId):
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
     soup = BeautifulSoup(resp.text, "html.parser")
