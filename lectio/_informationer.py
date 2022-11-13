@@ -24,9 +24,14 @@ def fåBruger(self, brugerId):
 
     bruger = {
         "navn": titel.split(" - ")[-1],
-        "pictureid": re.search("pictureid=\d+", soup.find("img").get("src")).group().replace("pictureid=", ""),
+        "pictureid": None,
         "type": titel.split(" - ")[0].lower()
     }
+
+    try:
+        bruger["pictureid"] = re.search("pictureid=\d+", soup.find("img").get("src")).group().replace("pictureid=", "")
+    except AttributeError:
+        pass
 
     if bruger["type"] == "lærer":
         bruger["hold"] = {}
