@@ -49,21 +49,36 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
         "Lokaler": "Lokale"
     }
 
+    statusDictionary = {
+        "s2brik": "normal",
+        "s2cancelled": "aflyst",
+        "s2changed": "ændret"
+    }
+
     for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
         if i != 0:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
-                modulDetaljer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
-
                 modulDict = {
                     "navn": None,
                     "tidspunkt": None,
                     "hold": None,
                     "lærer": None,
                     "lokale": None,
+                    "status": "normal",
                     "absid": re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", ""),
                     "andet": None
                 }
+
+                modulDetaljer = modul
+                statusClass = modulDetaljer.get("class")[2]
+                if statusClass in statusDictionary:
+                    modulDict["status"] = statusDictionary[modulDetaljer.get("class")[2]]
+                else:
+                    modulDict["status"] = modulDetaljer.get("class")[2]
+
+                modulDetaljer = modulDetaljer["data-additionalinfo"].split("\n\n")[0].split("\n")
+
                 for modulDetalje in modulDetaljer:
                     if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
                         if (navn := modulDetalje.split(": ")[0]) in renameDictionary:

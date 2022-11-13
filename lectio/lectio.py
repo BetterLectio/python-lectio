@@ -6,7 +6,7 @@ TODO:
 """
 
 from .imports import *
-from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer
+from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer
 
 class sdk:
     def __init__(self, brugernavn, adgangskode, skoleId, base64Cookie=None):
@@ -47,11 +47,11 @@ class sdk:
     def beskeder(self, id=None):
         return _beskeder.beskeder(self, id=id)
 
-    def lærere(self):
-        return _informationer.lærere(self)
-
-    def elever(self, forbogstav, retry=False):
-        return _informationer.elever(self, forbogstav, retry=retry)
+    def informationer(self):
+        return _informationer.informationer(self)
 
     def fåElev(self, elevId):
         return _informationer.fåElev(self, elevId)
+
+    def fåFil(self, filUrl):
+        return _filer.fåFil(self, filUrl)

@@ -83,7 +83,7 @@ Returneret format:
 ]
 ```
 
-## Elever
+## ~~Elever~~ Brug informationer() i stedet
 Få alle elever på skolen med et bestemt forbogstav.
 ```python
 elever = client.elever(forbogstav="A")
