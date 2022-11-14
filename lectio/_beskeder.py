@@ -12,27 +12,26 @@ def beskeder(self, id=None):
     resp = self.session.get(url)
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    selected = None
     options = []
     for div in soup.find("div", {"id": "s_m_Content_Content_ListGridSelectionTree"}).find_all("div", {
         "lec-role": "treeviewnodecontainer"}):
-        name = div.text.rstrip()
-        if div.find("a", {"class": "selectedFolder"}) != None:
-            selected = name
         if "-" in div.get("lec-node-id"):
+            name = div.text.rstrip()
+            option = {
+                "name": None,
+                "id": div.get("lec-node-id"),
+                "selected": False,
+                "content": []
+            }
+            if div.find("a", {"class": "selectedFolder"}) != None:
+                option["selected"] = True
+
             if len(name.split("\n")) == 1:
-                options.append({
-                    "name": name,
-                    "id": div.get("lec-node-id"),
-                    "content": []
-                })
+                option["name"] = name
+                options.append(option)
             else:
                 name = div.text.rstrip().split("\n")[0]
-                option = {
-                    "name": name,
-                    "id": div.get("lec-node-id"),
-                    "content": []
-                }
+                option["name"] = name
                 for item in div.find_all("div", {"lec-role": "treeviewnodecontainer"}):
                     option["content"].append({
                         "name": item.text.rstrip(),
@@ -72,7 +71,7 @@ def beskeder(self, id=None):
 
         beskeder.append(besked)
 
-    return {"beskedSide": selected, "beskedMuligheder": options, "beskeder": beskeder}
+    return {"besked_muligheder": options, "beskeder": beskeder}
 
 def besked(self, message_id):
     pass
