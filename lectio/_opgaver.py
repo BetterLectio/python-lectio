@@ -8,14 +8,15 @@ def opgave(self, exerciseid):
         "oplysninger": {},
         "gruppemedlemmer": [],
         "afleveres_af": {},
-        "opgave_indlæg": None
+        "opgave_indlæg": []
     }
 
     for tr in soup.find("table", {"class": "ls-std-table-inputlist"}).find_all("tr"):
-        opgaveDict["oplysninger"][unicodedata.normalize("NFKD", tr.find("th").text.lower().replace(" ", "_"))] = unicodedata.normalize("NFKD", tr.find("td").text)
+        opgaveDict["oplysninger"][unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_")] = unicodedata.normalize("NFKD", tr.find("td").text)
 
-    for tr in soup.find("table", {"class": "ls-table-layout1 lf-grid"}).find_all("tr")[1:]:
-        opgaveDict["gruppemedlemmer"].append(unicodedata.normalize("NFKD", tr.text.lstrip().rstrip()))
+    if soup.find_all("span", {"class": "islandHeader"})[1].text == "Gruppeaflevering":
+        for tr in soup.find("table", {"class": "ls-table-layout1 lf-grid"}).find_all("tr")[1:]:
+            opgaveDict["gruppemedlemmer"].append(unicodedata.normalize("NFKD", tr.text.lstrip().rstrip()))
 
     header = soup.find("table", {"class": "ls-table-layout1 maxW textTop lf-grid"}).find_all("tr", {"class": ""})[0]
     headerIdentifiers = []
@@ -25,10 +26,26 @@ def opgave(self, exerciseid):
     for tr in soup.find("table", {"class": "ls-table-layout1 maxW textTop lf-grid"}).find_all("tr")[1:]:
         i = 0
         for td in tr.find_all("td")[1:]:
-            print(td.text)
-            print(headerIdentifiers[i])
-            opgaveDict["afleveres_af"][headerIdentifiers[i]] = unicodedata.normalize("NFKD", td.text.lstrip())
+            if (identifier := headerIdentifiers[i]) == "afsluttet":
+                opgaveDict["afleveres_af"][identifier] = td.find("input").get("checked") == "checked"
+            else:
+                opgaveDict["afleveres_af"][identifier] = unicodedata.normalize("NFKD", td.text).lstrip().rstrip()
             i += 1
+
+    indlægHtml = soup.find("table", {"id": "m_Content_RecipientGV"})
+    indlægHeader = [header.text.lower().replace(" ", "_") for header in indlægHtml.find_all("th")]
+
+    for tr in indlægHtml.find_all("tr")[1:]:
+        indlæg = {}
+        i = 0
+        for td in tr.find_all("td"):
+            if (identifier := indlægHeader[i]) == "dokument" and (href := td.get('href')) != None:
+                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}]{href}"
+            else:
+                indlæg[identifier] = td.text.lstrip().rstrip()
+            i += 1
+
+        opgaveDict["opgave_indlæg"].append(indlæg)
 
     return opgaveDict
 def opgaver(self):
