@@ -12,11 +12,14 @@ def opgave(self, exerciseid):
     }
 
     for tr in soup.find("table", {"class": "ls-std-table-inputlist"}).find_all("tr"):
-        opgaveDict["oplysninger"][unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_")] = unicodedata.normalize("NFKD", tr.find("td").text)
+        if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_")) == "ansvarlig:":
+            opgaveDict["oplysninger"][identifier] = {"navn": unicodedata.normalize("NFKD", tr.find("td").text), "bruger_id": tr.find("span").get("data-lectiocontextcard")}
+        else:
+            opgaveDict["oplysninger"][identifier] = unicodedata.normalize("NFKD", tr.find("td").text)
 
     if soup.find_all("span", {"class": "islandHeader"})[1].text == "Gruppeaflevering":
         for tr in soup.find("table", {"class": "ls-table-layout1 lf-grid"}).find_all("tr")[1:]:
-            opgaveDict["gruppemedlemmer"].append(unicodedata.normalize("NFKD", tr.text.lstrip().rstrip()))
+            opgaveDict["gruppemedlemmer"].append({"navn": unicodedata.normalize("NFKD", tr.text.lstrip().rstrip()), "bruger_id": tr.find("span").get("data-lectiocontextcard")})
 
     header = soup.find("table", {"class": "ls-table-layout1 maxW textTop lf-grid"}).find_all("tr", {"class": ""})[0]
     headerIdentifiers = []
@@ -28,6 +31,8 @@ def opgave(self, exerciseid):
         for td in tr.find_all("td")[1:]:
             if (identifier := headerIdentifiers[i]) == "afsluttet":
                 opgaveDict["afleveres_af"][identifier] = td.find("input").get("checked") == "checked"
+            elif identifier == "elev":
+                opgaveDict["afleveres_af"][identifier] = {"navn": unicodedata.normalize("NFKD", td.text).lstrip().rstrip(), "bruger_id": td.find_all("span")[1].get("data-lectiocontextcard")}
             else:
                 opgaveDict["afleveres_af"][identifier] = unicodedata.normalize("NFKD", td.text).lstrip().rstrip()
             i += 1
@@ -41,6 +46,8 @@ def opgave(self, exerciseid):
         for td in tr.find_all("td"):
             if (identifier := indlægHeader[i]) == "dokument" and (href := td.find("a").get('href')) != None:
                 indlæg[identifier] = f"[{td.text.lstrip().rstrip()}](https://www.lectio.dk{href})"
+            elif identifier == "bruger":
+                indlæg[identifier] = {"navn": td.text.lstrip().rstrip(), "bruger_id": td.find("span").get("data-lectiocontextcard")}
             else:
                 indlæg[identifier] = td.text.lstrip().rstrip()
             i += 1
