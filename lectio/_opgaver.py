@@ -39,8 +39,8 @@ def opgave(self, exerciseid):
         indlæg = {}
         i = 0
         for td in tr.find_all("td"):
-            if (identifier := indlægHeader[i]) == "dokument" and (href := td.get('href')) != None:
-                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}]{href}"
+            if (identifier := indlægHeader[i]) == "dokument" and (href := td.find("a").get('href')) != None:
+                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}]({href})"
             else:
                 indlæg[identifier] = td.text.lstrip().rstrip()
             i += 1
