@@ -40,7 +40,7 @@ def opgave(self, exerciseid):
         i = 0
         for td in tr.find_all("td"):
             if (identifier := indlægHeader[i]) == "dokument" and (href := td.find("a").get('href')) != None:
-                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}]({href})"
+                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}](https://www.lectio.dk{href})"
             else:
                 indlæg[identifier] = td.text.lstrip().rstrip()
             i += 1
