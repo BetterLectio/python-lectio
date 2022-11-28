@@ -14,6 +14,8 @@ def opgave(self, exerciseid):
     for tr in soup.find("table", {"class": "ls-std-table-inputlist"}).find_all("tr"):
         if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_")) == "ansvarlig:":
             opgaveDict["oplysninger"][identifier] = {"navn": unicodedata.normalize("NFKD", tr.find("td").text), "bruger_id": tr.find("span").get("data-lectiocontextcard")}
+        elif identifier == "opgavebeskrivelse:":
+            opgaveDict["oplysninger"][identifier] = f'[{unicodedata.normalize("NFKD", tr.find("td").text).lstrip().rstrip()}](https://www.lectio.dk{tr.find("a").get("href")})'
         else:
             opgaveDict["oplysninger"][identifier] = unicodedata.normalize("NFKD", tr.find("td").text)
 
