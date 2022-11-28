@@ -21,9 +21,9 @@ def opgave(self, exerciseid):
         "opgave_indlæg": []
     }
     for tr in soup.find("table", {"class": "ls-std-table-inputlist"}).find_all("tr"):
-        if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_"))[:-1] == "ansvarlig":
+        if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_").replace(":", "")) == "ansvarlig:":
             opgaveDict["oplysninger"][identifier] = {"navn": unicodedata.normalize("NFKD", tr.find("td").text), "bruger_id": tr.find("span").get("data-lectiocontextcard")}
-        elif identifier == "opgavebeskrivelse":
+        elif identifier == "opgavebeskrivelse:":
             opgaveBeskrivelse = ""
             for a in tr.find_all("a"):
                 opgaveBeskrivelse += f'[{unicodedata.normalize("NFKD", a.text).lstrip().rstrip()}](https://www.lectio.dk{a.get("href")})\n  '
@@ -47,6 +47,9 @@ def opgave(self, exerciseid):
                 opgaveDict["afleveres_af"][identifier] = td.find("input").get("checked") == "checked"
             elif identifier == "elev":
                 opgaveDict["afleveres_af"][identifier] = {"navn": unicodedata.normalize("NFKD", td.text).lstrip().rstrip(), "bruger_id": td.find_all("span")[1].get("data-lectiocontextcard")}
+            elif identifier == "status_-_frav\u00e6r":
+                opgaveDict["afleveres_af"]["status_frav\u00e6r"] = unicodedata.normalize("NFKD", td.text).lstrip().rstrip()
+            
             else:
                 opgaveDict["afleveres_af"][identifier] = unicodedata.normalize("NFKD", td.text).lstrip().rstrip()
             i += 1
