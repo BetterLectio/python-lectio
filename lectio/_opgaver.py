@@ -26,7 +26,7 @@ def opgave(self, exerciseid):
         elif identifier == "opgavebeskrivelse:":
             opgaveBeskrivelse = ""
             for a in tr.find_all("a"):
-                opgaveBeskrivelse += f'[{unicodedata.normalize("NFKD", a.text).lstrip().rstrip()}]({a.get("href")})\n  '
+                opgaveBeskrivelse += f'[{unicodedata.normalize("NFKD", a.text).lstrip().rstrip()}](https://www.lectio.dk{a.get("href")})\n  '
             opgaveDict["oplysninger"][identifier] = opgaveBeskrivelse[:-1]
         else:
             opgaveDict["oplysninger"][identifier] = unicodedata.normalize("NFKD", tr.find("td").text)
