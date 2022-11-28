@@ -5,17 +5,29 @@ def opgave(self, exerciseid):
     soup = BeautifulSoup(resp.text, "html.parser")
 
     opgaveDict = {
-        "oplysninger": {},
+        "oplysninger": {
+            "opgavetitel:": None,
+            "opgavebeskrivelse:": None,
+            "opgavenote:": None,
+            "hold:": None,
+            "karakterskala:": None,
+            "ansvarlig:": None,
+            "elevtid:": None,
+            "afleveringsfrist:": None,
+            "i_undervisningsbeskrivelse:": None
+        },
         "gruppemedlemmer": [],
         "afleveres_af": {},
         "opgave_indlæg": []
     }
-
     for tr in soup.find("table", {"class": "ls-std-table-inputlist"}).find_all("tr"):
         if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_")) == "ansvarlig:":
             opgaveDict["oplysninger"][identifier] = {"navn": unicodedata.normalize("NFKD", tr.find("td").text), "bruger_id": tr.find("span").get("data-lectiocontextcard")}
         elif identifier == "opgavebeskrivelse:":
-            opgaveDict["oplysninger"][identifier] = f'[{unicodedata.normalize("NFKD", tr.find("td").text).lstrip().rstrip()}](https://www.lectio.dk{tr.find("a").get("href")})'
+            opgaveBeskrivelse = ""
+            for a in tr.find_all("a"):
+                opgaveBeskrivelse += f'[{unicodedata.normalize("NFKD", a.text).lstrip().rstrip()}]({a.get("href")})\n  '
+            opgaveDict["oplysninger"][identifier] = opgaveBeskrivelse[:-1]
         else:
             opgaveDict["oplysninger"][identifier] = unicodedata.normalize("NFKD", tr.find("td").text)
 
