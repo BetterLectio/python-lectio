@@ -52,13 +52,20 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
     statusDictionary = {
         "s2brik": "normal",
         "s2cancelled": "aflyst",
-        "s2changed": "ændret"
+        "s2changed": "ændret",
+
+        "s2bgboxeksamen": "eksamen"
     }
 
     for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
         if i != 0:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
+                try:
+                    absid = re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", "")
+                except Exception:
+                    absid = modul.get("href")
+
                 modulDict = {
                     "navn": None,
                     "tidspunkt": None,
@@ -66,7 +73,7 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
                     "lærer": None,
                     "lokale": None,
                     "status": "normal",
-                    "absid": re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", ""),
+                    "absid": absid,
                     "andet": None
                 }
 
