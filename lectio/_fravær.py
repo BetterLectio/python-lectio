@@ -97,19 +97,19 @@ def fravær(self):
                     except Exception:
                         modulDict["navn"] = modulDetalje.split(": ")[0]
 
-        tds = tr.find_all("td")
+            tds = tr.find_all("td")
 
-        fravær["moduler"]["oversigt"].append({
-            "type": tds[0].text.lstrip(),
-            "uge": tds[1].text.lstrip(),
-            "aktivitet": modulDict,
-            "fravær": tds[3].text.lstrip(),
-            "fraværstype": tds[4].text.lstrip(),
-            "registreret": tds[5].text.lstrip(),
-            "lærer": tds[6].text.lstrip(),
-            "bemærkning": tds[7].text.lstrip(),
-            "årsag": tds[8].text.lstrip(),
-            "årsagsnote": tds[9].text.lstrip(),
-        })
+            fravær["moduler"]["oversigt"].append({
+                "type": tds[0].text.lstrip(),
+                "uge": tds[1].text.lstrip(),
+                "aktivitet": modulDict,
+                "fravær": tds[3].text.lstrip(),
+                "fraværstype": tds[4].text.lstrip(),
+                "registreret": tds[5].text.lstrip(),
+                "lærer": tds[6].text.lstrip(),
+                "bemærkning": tds[7].text.lstrip(),
+                "årsag": tds[8].text.lstrip(),
+                "årsagsnote": tds[9].text.lstrip(),
+            })
 
     return fravær
