@@ -7,7 +7,7 @@ def modul(self, absid):
 
     modulDetaljer = {
         "aktivitet": None,
-        "note": None,
+        "note": "",
         "lektier": "",
         "øvrigtIndhold": ""
     }
