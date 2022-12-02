@@ -46,6 +46,9 @@ class sdk:
     def opgaver(self):
         return _opgaver.opgaver(self)
 
+    def besked(self, message_id):
+        return _beskeder.besked(self, message_id=message_id)
+
     def beskeder(self, id=None):
         return _beskeder.beskeder(self, id=id)
 

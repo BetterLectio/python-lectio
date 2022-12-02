@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-VERSION = '1.5.3'
+VERSION = '1.6.0'
 DESCRIPTION = 'En SDK til gymnasie siden Lectio'
 long_description = (Path(__file__).parent / "README.md").read_text()
 
@@ -17,7 +17,7 @@ setup(
     license_files = ('LICENSE.txt',),
     long_description_content_type='text/markdown',
     packages=find_packages(),
-    install_requires=["requests", "beautifulsoup4"],
+    install_requires=["requests", "beautifulsoup4", "markdownify"],
     keywords=['python', 'lectio', 'sdk', 'gymnasie', 'gymnasium'],
     classifiers=[
         "Development Status :: 1 - Planning",

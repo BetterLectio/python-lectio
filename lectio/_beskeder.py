@@ -1,3 +1,5 @@
+import re
+
 from .imports import *
 
 def beskeder(self, id=None):
@@ -74,7 +76,34 @@ def beskeder(self, id=None):
     return {"besked_muligheder": options, "beskeder": beskeder}
 
 def besked(self, message_id):
-    pass
+    resp = self.session.get(f"https://www.lectio.dk/lectio/681/beskeder2.aspx?type=showthread&elevid={self.elevId}&id={message_id}")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    beskeder = []
+    beskederHtml = soup.find("ul", {"id": "s_m_Content_Content_ThreadList"}).find_all("li")
+
+    for besked in beskederHtml:
+        bruger = besked.find("span")
+        beskedDiv = None
+        for div in besked.find_all("div"):
+            if div.get("class") == None:
+                beskedDiv = div
+                break
+
+        if beskedDiv == None:
+            raise Exception("Kan ikke finde besked, rapporter venligst dette på Github")
+
+        beskedDict = {
+            "bruger": {"navn:": bruger.text, "id": bruger.get("data-lectiocontextcard")},
+            "titel": besked.find("h4").text,
+            "dato": re.search("[0-9]+/[0-9]+-[0-9]+ [0-9]+:[0-9]+", besked.find("td").text).group(),
+            "padding_left": re.search("padding-left:\d*\.?\d*", str(besked.get("style"))).group().replace("padding-left:", ""),
+            "besked": markdownify.markdownify(str(beskedDiv), heading_style="ATX").lstrip().rstrip().replace("\n\n", "\n"),
+            "vedhæftninger": [{"navn": vedhæft.text, "href": "https://www.lectio.dk"+vedhæft.get("href")} for vedhæft in besked.find("td").find_all("a", {"id": None})]
+        }
+        beskeder.append(beskedDict)
+
+    return beskeder
 
 def sendBesked(self, message_id, content):
     pass
