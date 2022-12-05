@@ -23,6 +23,7 @@ def fravær(self):
             fravær["generalt"].append({
                 "hold": row[0].text,
                 "fravær_procent": row[1].text,
+                "fravær_moduler": row[2].text,
             })
 
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/subnav/fravaerelev_fravaersaarsager.aspx?elevid={self.elevId}")
