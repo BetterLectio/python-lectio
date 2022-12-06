@@ -1,5 +1,3 @@
-import re
-
 from .imports import *
 
 def beskeder(self, id=None):
