@@ -80,6 +80,13 @@ def besked(self, message_id):
     beskeder = []
     beskederHtml = soup.find("ul", {"id": "s_m_Content_Content_ThreadList"}).find_all("li")
 
+    paddingLeftResponseNum = {}
+    i = 0
+
+    _beskederOgRespons = {}
+
+    lastI = i
+    beskederNy = []
     for besked in beskederHtml:
         bruger = besked.find("span")
         beskedDiv = None
@@ -91,15 +98,45 @@ def besked(self, message_id):
         if beskedDiv == None:
             raise Exception("Kan ikke finde besked, rapporter venligst dette på Github")
 
+        paddingLeft = re.search("padding-left:\d*\.?\d*", str(besked.get("style"))).group().replace("padding-left:", "")
+
         beskedDict = {
-            "bruger": {"navn": bruger.text, "id": bruger.get("data-lectiocontextcard")},
+            "bruger": {"navn:": bruger.text, "id": bruger.get("data-lectiocontextcard")},
             "titel": besked.find("h4").text,
             "dato": re.search("[0-9]+/[0-9]+-[0-9]+ [0-9]+:[0-9]+", besked.find("td").text).group(),
             "padding_left": re.search("padding-left:\d*\.?\d*", str(besked.get("style"))).group().replace("padding-left:", ""),
             "besked": markdownify.markdownify(str(beskedDiv), heading_style="ATX").lstrip().rstrip().replace("\n\n", "\n"),
-            "vedhæftninger": [{"navn": vedhæft.text, "href": "https://www.lectio.dk"+vedhæft.get("href")} for vedhæft in besked.find("td").find_all("a", {"id": None})]
+            "vedhæftninger": [{"navn": vedhæft.text, "href": "https://www.lectio.dk"+vedhæft.get("href")} for vedhæft in besked.find("td").find_all("a", {"id": None})],
+            "svar": []
         }
+        if i == 0:
+            beskederNy.append(beskedDict)
+
+
+        hoppeMængde = ""
+        for j in range(i):
+            hoppeMængde += "[0][\"svar\"]"
+
+        if paddingLeft not in paddingLeftResponseNum:
+            paddingLeftResponseNum[paddingLeft] = i
+            if i != 0:
+                print(f"beskederNy{hoppeMængde} = [{beskedDict}]")
+                exec(f"beskederNy{hoppeMængde} = [{beskedDict}]")
+        else:
+            i = paddingLeftResponseNum[paddingLeft]
+            exec(f"beskederNy{hoppeMængde}.append({beskedDict})")
+
+        #print(f"Svar til besked #{i}: {beskedDict}")
+
         beskeder.append(beskedDict)
+
+        _beskederOgRespons[str(i)] = beskedDict
+
+        #print(beskederNy)
+        i += 1
+
+    print(json.dumps(beskederNy, indent=2))
+    exit()
 
     return beskeder
 
