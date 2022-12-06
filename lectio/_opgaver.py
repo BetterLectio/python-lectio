@@ -21,9 +21,9 @@ def opgave(self, exerciseid):
         "opgave_indlæg": []
     }
     for tr in soup.find("table", {"class": "ls-std-table-inputlist"}).find_all("tr"):
-        if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_").replace(":", "")) == "ansvarlig:":
+        if (identifier := unicodedata.normalize("NFKD", tr.find("th").text).lower().replace(" ", "_").replace(":", "")) == "ansvarlig":
             opgaveDict["oplysninger"][identifier] = {"navn": unicodedata.normalize("NFKD", tr.find("td").text), "bruger_id": tr.find("span").get("data-lectiocontextcard")}
-        elif identifier == "opgavebeskrivelse:":
+        elif identifier == "opgavebeskrivelse":
             opgaveBeskrivelse = ""
             for a in tr.find_all("a"):
                 opgaveBeskrivelse += f'[{unicodedata.normalize("NFKD", a.text).lstrip().rstrip()}](https://www.lectio.dk{a.get("href")})\n  '
