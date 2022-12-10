@@ -12,6 +12,22 @@ def beskeder(self, id=None):
     resp = self.session.get(url)
     soup = BeautifulSoup(resp.text, "html.parser")
 
+    beskederHtml = soup.find_all("tr")
+
+    if (sideInddeling := soup.find("tr", {"class": "paging heavy"})) != None:
+        payload = {}
+        for _input in soup.find("form", {"id": "aspnetForm"}).find_all("input", {"type": "hidden"}):
+            id = _input.get("id")
+            if id == None:
+                id = _input.get("name")
+            payload[id] = _input.get("value")
+        payload["__EVENTTARGET"] = sideInddeling.find_all("td")[-1].find("a").get("href").split("\"")[1].split("\"")[0]
+
+        resp = self.session.post(url, data=payload)
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        beskederHtml = soup.find_all("tr")[2:-2]
+
     options = []
     for div in soup.find("div", {"id": "s_m_Content_Content_ListGridSelectionTree"}).find_all("div", {
         "lec-role": "treeviewnodecontainer"}):
@@ -40,8 +56,6 @@ def beskeder(self, id=None):
 
                 options.append(option)
 
-    beskederHtml = soup.find_all("tr")
-
     beskedHeader = []
     for th in beskederHtml[0].find_all("th"):
         if len(header := th.text.rstrip()) != 0:
@@ -65,6 +79,7 @@ def beskeder(self, id=None):
                         besked[beskedHeader[i]] = value
 
                     if beskedHeader[i] == "emne":
+                        print(td.find("a"))
                         besked["message_id"] = re.findall("\$_\d+", td.find("a").get("onclick"))[0].replace("$_", "")
 
                 i += 1
