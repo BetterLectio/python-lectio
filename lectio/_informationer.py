@@ -16,7 +16,7 @@ def informationer(self):
 
     return informationerDict
 
-def fåBruger(self, brugerId):
+def fåBruger(self, brugerId, hold_gruppe=True):
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/contextcard/contextcard.aspx?lectiocontextcard={brugerId}")
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -39,6 +39,9 @@ def fåBruger(self, brugerId):
             bruger["hold"][hold.text] = re.search("holdelementid=\d+", hold.get("href")).group().replace("holdelementid=", "")
     else:
         bruger["stamklasse"] = soup.find("table", {"class": "textTop"}).find_all("td")[1].text
+        if hold_gruppe:
+            pass
+
 
     return bruger
 

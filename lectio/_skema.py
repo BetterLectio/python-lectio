@@ -22,9 +22,19 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
         "modulTider": {},
         "ugeDage": [],
         "moduler": [],
-        "dagsNoter": []
+        "dagsNoter": [],
+        "hold": [],
+        "grupper": []
     }
 
+    holdOgGrupper = soup.find("div", {"id": "s_m_Content_Content_holdElementLinkList"})
+    for tr in holdOgGrupper.find_all("tr"):
+        content = tr.find_all("li")
+        if "Hold" in str(tr.find("th")):
+            print("Hold", content)
+        else:
+            print("Gruppe", content)
+    exit()
     for modulTid in soup.find_all("div", {"class": "s2module-info"}):
         skema["modulTider"][modulTid.prettify().split("\n")[2].lstrip()] = modulTid.prettify().split("\n")[4].lstrip()
 
