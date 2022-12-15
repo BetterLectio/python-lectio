@@ -31,10 +31,12 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
     for tr in holdOgGrupper.find_all("tr"):
         content = tr.find_all("li")
         if "Hold" in str(tr.find("th")):
-            print("Hold", content)
+            for hold in content:
+                skema["hold"].append({"navn": hold.text, "id": hold.find("a").get("href").split("holdelementid=")[1]})
         else:
-            print("Gruppe", content)
-    exit()
+            for gruppe in content:
+                skema["grupper"].append({"navn": gruppe.text, "id": gruppe.find("a").get("href").split("holdelementid=")[1]})
+
     for modulTid in soup.find_all("div", {"class": "s2module-info"}):
         skema["modulTider"][modulTid.prettify().split("\n")[2].lstrip()] = modulTid.prettify().split("\n")[4].lstrip()
 
