@@ -61,6 +61,8 @@ def login(self):
     if not successful:
         raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
 
+    self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
+
 
 def base64Cookie(self):
     cookie = self.session.cookies.get_dict()

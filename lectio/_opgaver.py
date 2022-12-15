@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def opgave(self, exerciseid):
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/ElevAflevering.aspx?elevid={self.elevId}&exerciseid={exerciseid}")
@@ -76,6 +77,10 @@ def opgaver(self):
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/OpgaverElev.aspx?elevid={self.elevId}")
     soup = BeautifulSoup(resp.text, "html.parser")
 
+    if str(soup.find("input", {"id": "s_m_Content_Content_CurrentExerciseFilterCB"}).get("checked")) == "checked":
+        resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/OpgaverElev.aspx?elevid={self.elevId}", data=_utils.generatePayload(soup, "s$m$Content$Content$CurrentExerciseFilterCB"))
+        soup = BeautifulSoup(resp.text, "html.parser")
+
     opgaver = []
     header = []
 
@@ -95,6 +100,8 @@ def opgaver(self):
             opgaveDict[header[i]] = td.text.lstrip()
             i += 1
 
+        if opgaveDict["afventer"] == "":
+            opgaveDict["status"] = "Afsluttet"
         opgaver.append(opgaveDict)
 
     return opgaver
