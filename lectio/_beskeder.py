@@ -7,7 +7,7 @@ def beskeder(self, id=None):
         else:
             url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=selecthold&elevid={self.elevId}&holdid={id}"
     else:
-        url = f"https://www.lectio.dk/lectio/680/beskeder2.aspx?type=liste&elevid={self.elevId}"
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=liste&elevid={self.elevId}"
 
     resp = self.session.get(url)
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -89,7 +89,7 @@ def beskeder(self, id=None):
     return {"besked_muligheder": options, "beskeder": beskeder}
 
 def besked(self, message_id):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/681/beskeder2.aspx?type=showthread&elevid={self.elevId}&id={message_id}")
+    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&elevid={self.elevId}&id={message_id}")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     beskeder = []

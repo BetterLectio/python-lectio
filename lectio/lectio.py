@@ -2,7 +2,6 @@
 TODO:
   * Gør elev og lærer id til id men hvor at elev id har et S foran (Eks: S123456789) og lærer har et T foran (Eks: T12345678)
   * Fjern retry fra enkelte funktioner og gør det til en general ting
-  * Få lærere, elever, lokaler, osv. fra https://www.lectio.dk/lectio/681/FindSkemaAdv.aspx
 """
 
 from .imports import *
