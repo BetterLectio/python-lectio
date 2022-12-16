@@ -11,7 +11,7 @@ def dokumenter(self, folderid=None):
             if element != None:
                 if str(element) != "\n":
                     itemDict = {
-                        "name": element.find("div", {"class": "TreeNode-title"}).text,
+                        "navn": element.find("div", {"class": "TreeNode-title"}).text,
                         "type": "folder",
                         "id": element.get("lec-node-id")
                     }
