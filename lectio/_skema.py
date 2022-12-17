@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def skema(self, retry=False, uge=None, år=None, elevId=None):
     if elevId == None:
@@ -73,50 +74,7 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
         if i != 0:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
-                try:
-                    absid = re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", "")
-                except Exception:
-                    absid = modul.get("href")
-
-                modulDict = {
-                    "navn": None,
-                    "tidspunkt": None,
-                    "hold": None,
-                    "lærer": None,
-                    "lokale": None,
-                    "status": "normal",
-                    "absid": absid,
-                    "andet": None
-                }
-
-                modulDetaljer = modul
-                statusClass = modulDetaljer.get("class")[2]
-                if statusClass in statusDictionary:
-                    modulDict["status"] = statusDictionary[modulDetaljer.get("class")[2]]
-                else:
-                    modulDict["status"] = modulDetaljer.get("class")[2]
-
-                modulDetaljer = modulDetaljer["data-additionalinfo"].split("\n\n")[0].split("\n")
-
-                for modulDetalje in modulDetaljer:
-                    if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
-                        if (navn := modulDetalje.split(": ")[0]) in renameDictionary:
-                            navn = renameDictionary[navn]
-
-                        modulDict[navn.lower()] = value
-                    else:
-                        try:
-                            int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0],
-                                                  "%d/%m-%Y %H:%M").timestamp())
-                            modulDict["tidspunkt"] = modulDetalje
-                        except Exception:
-                            modulDict["navn"] = modulDetalje.split(": ")[0]
-
-                try:
-                    modulDict["andet"] = modul["data-additionalinfo"].split("\n\n")[1]
-                except Exception:
-                    pass
-
+                modulDict = _utils.skemaBrikExtract(modul)
                 skema["moduler"].append(modulDict)
         i += 1
 
