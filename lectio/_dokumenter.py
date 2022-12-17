@@ -4,7 +4,7 @@ def dokumenter(self, folderid=None):
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}" if folderid == None else f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}&folderid={folderid}")
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    dokumenterDict = {"titel": soup.find("span", {"id": "s_m_Content_Content_FolderLabel"}).text, "parent_id": None, "indhold": []}
+    dokumenterDict = {"titel": soup.find("span", {"id": "s_m_Content_Content_FolderLabel"}).text, "indhold": []}
 
     if folderid == None:
         for element in soup.find("div", {"id": "s_m_Content_Content_FolderTreeView"}):
@@ -18,7 +18,12 @@ def dokumenter(self, folderid=None):
                     dokumenterDict["indhold"].append(itemDict)
     else:
         _element = soup.find("div", {"lec-node-id": folderid})
-        dokumenterDict["parent_id"] = _element.parent.parent.get("lec-node-id")
+        backId = _element.parent.parent.get("lec-node-id")
+        dokumenterDict["indhold"].append({
+            "navn": "..",
+            "type": "folder",
+            "id": backId if backId != None else ".."
+        })
 
         element = _element.find("div", {"lec-role": "ltv-sublist"})
         if element != None:
