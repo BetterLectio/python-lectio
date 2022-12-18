@@ -65,8 +65,7 @@ def forside(self):
                 })
             except IndexError:
                 pass
-    print(forsideDict["undervisning"])
-    exit()
+
     for id, type in [["s_m_Content_Content_SpoergeSkemaerInfo", "spørgeskemaer"], ["s_m_Content_Content_ElevOpgaveAfleveringer", "opgaveaflevering"], ["s_m_Content_Content_LektierOversigt", "lektier"]]:
         for tr in undervisning.find("table", {"id": id}).find_all("tr"):
             tds = tr.find_all("td")
