@@ -22,7 +22,7 @@ def forside(self):
     for tr in soup.find("div", {"id": "s_m_Content_Content_aktueltIsland_pa"}).find_all("tr", {"class": "DashWithScroll textTop"}):
         forsideDict["aktuelt"].append({
             "punkt_farve": colorDict[tr.find("td", {"class": "iconCol"}).find("img").get("src").split("/")[-1]],
-            "text": markdownify.markdownify(str(tr.find("td", {"class": "infoCol"})), heading_style="ATX").lstrip().rstrip().replace("\n\n", "\n"), #HTML til markdown det
+            "text": markdownify.markdownify(str(tr.find("td", {"class": "infoCol"}).find("span")), heading_style="ATX").lstrip().rstrip().replace("\n\n", "\n"), #HTML til markdown det
         })
 
 
