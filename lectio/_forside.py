@@ -20,7 +20,7 @@ def forside(self):
     }
 
     for tr in soup.find("div", {"id": "s_m_Content_Content_aktueltIsland_pa"}).find_all("tr", {"class": "DashWithScroll textTop"}):
-        content = tr.find("td", {"class": "infoCol"})
+        content = tr.find("td", {"class": "infoCol"}).find("span")
         contentStr = str(content)
         for span in content.find_all("span", {"class": "bb_b"}):
             new = copy.copy(span)
