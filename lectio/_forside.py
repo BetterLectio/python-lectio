@@ -15,7 +15,7 @@ def forside(self):
     forsideDict = {
         "aktuelt": [],
         "kommunikation": {"beskeder": [], "dokumenter": []},
-        "undervisning": {"spørgeskemaer": [], "opgaveaflevering": [], "lektier": []},
+        "undervisning": {},
         "skema": []
     }
 
@@ -48,6 +48,25 @@ def forside(self):
                 pass
 
     undervisning = soup.find("div", {"id": "s_m_Content_Content_undervisningIsland_pa"})
+    headings = undervisning.find_all("div", {"role": "heading"})
+    tables = undervisning.find_all("table")
+
+    for i in range(len(headings)):
+        navn = headings[i].find("span", {"class": "dashboardLinkHeaderText"}).text.lower().replace(" ", "_")
+        forsideDict["undervisning"][navn] = []
+        for tr in tables[i].find_all("tr"):
+            tds = tr.find_all("td")
+            try:
+                forsideDict["undervisning"][navn].append({
+                    "navn": tds[1].text,
+                    "dato": tds[2].get("title"),
+                    "id": re.search("id=\d+", str(tds[1].find("a").get("href"))).group().replace("id=", ""),
+                    "punkt_farve": colorDict[tds[0].find("img").get("src").split("/")[-1]],
+                })
+            except IndexError:
+                pass
+    print(forsideDict["undervisning"])
+    exit()
     for id, type in [["s_m_Content_Content_SpoergeSkemaerInfo", "spørgeskemaer"], ["s_m_Content_Content_ElevOpgaveAfleveringer", "opgaveaflevering"], ["s_m_Content_Content_LektierOversigt", "lektier"]]:
         for tr in undervisning.find("table", {"id": id}).find_all("tr"):
             tds = tr.find_all("td")
