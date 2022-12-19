@@ -1,14 +1,16 @@
 from .imports import *
 
 def modul(self, absid):
-    resp = self.session.get(
-        f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    #resp = self.session.get(
+    #    f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}")
+    #soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(open("/home/jonathan/Hentet/Eleven_Johan_Thomas_Ohly_L_1d_-_Aktivitetsforside_-_Lectio_-_TEC (1).htm").read(), "html.parser")
 
     modulDetaljer = {
         "aktivitet": None,
-        "note": None,
+        "note": "",
         "lektier": "",
+        "præsentation": "",
         "øvrigtIndhold": ""
     }
 
@@ -25,19 +27,16 @@ def modul(self, absid):
                 last = divText.lower().title().replace(" ", "")
                 last = last[0].lower() + last[1:]
         else:
-            for element in str(div).split("\n"):
+            for element in str(div).replace(u'\xa0', u'\n').split("\n"):
                 elementSoup = BeautifulSoup(element, "html.parser")
                 if elementSoup.text != "":
                     if (elementWithHref := elementSoup.find("a", href=True)) != None:
                         href = elementWithHref.get('href')
                         if href.startswith(f"/lectio/{self.skoleId}"):
                             href = "https://www.lectio.dk" + href
-                        modulDetaljer[last] += unicodedata.normalize("NFKD",
-                                                                     f"[{elementSoup.text.rstrip().lstrip()}]({href})\n")
+                        modulDetaljer[last] += unicodedata.normalize("NFKD", f"[{elementSoup.text.rstrip().lstrip()}]({href})\n")
                     else:
-                        modulDetaljer[last] += unicodedata.normalize("NFKD",
-                                                                     elementSoup.text.rstrip().lstrip().replace(u"\xa0",
-                                                                                                                u" ") + "\n")
+                        modulDetaljer[last] += unicodedata.normalize("NFKD", elementSoup.text.rstrip().lstrip().replace(u"\xa0", u" ") + "\n")
 
     renameDictionary = {
         "Lærere": "Lærer",
