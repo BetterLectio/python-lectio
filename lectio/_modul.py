@@ -1,10 +1,9 @@
 from .imports import *
 
 def modul(self, absid):
-    #resp = self.session.get(
-    #    f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}")
-    #soup = BeautifulSoup(resp.text, "html.parser")
-    soup = BeautifulSoup(open("/home/jonathan/Hentet/Eleven_Johan_Thomas_Ohly_L_1d_-_Aktivitetsforside_-_Lectio_-_TEC (1).htm").read(), "html.parser")
+    resp = self.session.get(
+        f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}")
+    soup = BeautifulSoup(resp.text, "html.parser")
 
     modulDetaljer = {
         "aktivitet": None,
