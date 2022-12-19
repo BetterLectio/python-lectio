@@ -66,19 +66,6 @@ def forside(self):
             except IndexError:
                 pass
 
-    for id, type in [["s_m_Content_Content_SpoergeSkemaerInfo", "spørgeskemaer"], ["s_m_Content_Content_ElevOpgaveAfleveringer", "opgaveaflevering"], ["s_m_Content_Content_LektierOversigt", "lektier"]]:
-        for tr in undervisning.find("table", {"id": id}).find_all("tr"):
-            tds = tr.find_all("td")
-            try:
-                forsideDict["undervisning"][type].append({
-                    "navn": tds[1].text,
-                    "dato": tds[2].get("title"),
-                    "id": re.search("id=\d+", str(tds[1].find("a").get("href"))).group().replace("id=", ""),
-                    "punkt_farve": colorDict[tds[0].find("img").get("src").split("/")[-1]],
-                })
-            except IndexError:
-                pass
-
     for modul in soup.find("div", {"id": "s_m_Content_Content_skemaIsland_pa"}).find_all("a", {"class": "s2skemabrik"}):
         forsideDict["skema"].append(_utils.skemaBrikExtract(modul))
 
