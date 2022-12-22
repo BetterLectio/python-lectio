@@ -25,6 +25,7 @@ class sdk:
             for identifier, value in cookie.items():
                 self.session.cookies.set(identifier, value, domain="lectio.dk")
 
+            self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
     def login(self):
         return _auth.login(self)
 
