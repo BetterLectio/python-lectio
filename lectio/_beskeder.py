@@ -118,7 +118,12 @@ def besked(self, message_id):
         }
         beskeder.append(beskedDict)
 
-    return beskeder
+    beskedDict = {
+        "modtagere": soup.find("table", {"class": "ShowMessageRecipients"}).find("table", {"class": "maxWidth textTop"}).find_all("tr")[1].text.replace("Til:", "").lstrip().rstrip(),
+        "beskeder": beskeder
+    }
+
+    return beskedDict
 
 def besvarBesked(self, message_id, id, titel, content, _from):
     content = content  + "\n\n" + ["Sendt fra [url=github.com/BetterLectio/python-lectio] python-lectio [/url]", "Sendt fra [url=betterlectio.dk] Better Lectio [/url]"][_from]
