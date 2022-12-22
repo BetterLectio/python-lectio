@@ -5,7 +5,7 @@ TODO:
 """
 
 from .imports import *
-from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside
+from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside, _ledigeLokaler
 
 class sdk:
     def __init__(self, brugernavn, adgangskode, skoleId, base64Cookie=None):
@@ -75,3 +75,6 @@ class sdk:
 
     def besvarBesked(self, message_id, id, titel, content, _from=0):
         return _beskeder.besvarBesked(self, message_id, id, titel, content, _from)
+
+    def ledigeLokaler(self):
+        return _ledigeLokaler.ledigeLokaler(self)
