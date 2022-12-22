@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def beskeder(self, id=None):
     if id != None:
@@ -112,11 +113,34 @@ def besked(self, message_id):
             "dato": re.search("[0-9]+/[0-9]+-[0-9]+ [0-9]+:[0-9]+", besked.find("td").text).group(),
             "padding_left": re.search("padding-left:\d*\.?\d*", str(besked.get("style"))).group().replace("padding-left:", ""),
             "besked": markdownify.markdownify(str(beskedDiv), heading_style="ATX").lstrip().rstrip().replace("\n\n", "\n"),
-            "vedhæftninger": [{"navn": vedhæft.text, "href": "https://www.lectio.dk"+vedhæft.get("href")} for vedhæft in besked.find("td").find_all("a", {"id": None})]
+            "vedhæftninger": [{"navn": vedhæft.text, "href": "https://www.lectio.dk"+vedhæft.get("href")} for vedhæft in besked.find("td").find_all("a", {"id": None})],
+            "id": re.search("'\w+MESSAGE_\d+", str(besked.find("button").get("onclick"))).group().replace("'", ""),
         }
         beskeder.append(beskedDict)
 
     return beskeder
 
-def sendBesked(self, message_id, content):
-    pass
+def besvarBesked(self, message_id, id, titel, content, _from):
+    content = content  + "\n\n" + ["Sendt fra [url=github.com/BetterLectio/python-lectio] python-lectio [/url]", "Sendt fra [url=betterlectio.dk] Better Lectio [/url]"][_from]
+
+    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&elevid={self.elevId}&id={message_id}")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    payload = _utils.generatePayload(soup, "__Page")
+    payload["__EVENTARGUMENT"] = id
+    payload["__LASTFOCUS"] = ""
+    payload["s$m$searchinputfield"] = ""
+    payload["s$m$Content$Content$SPSearchText$tb"] = ""
+    payload["LectioPostbackId"] = ""
+
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={self.elevId}", data=payload)
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    payload = _utils.generatePayload(soup, "s$m$Content$Content$CreateAnswerOKBtn")
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={message_id}", data=f"__LASTFOCUS=&time=0&__EVENTTARGET=s%24m%24Content%24Content%24CreateAnswerOKBtn&__EVENTARGUMENT=&__SCROLLPOSITION=&__VIEWSTATEX={urllib.parse.quote(payload['__VIEWSTATEX'])}&__VIEWSTATEY_KEY=&__VIEWSTATE=&__VIEWSTATEENCRYPTED=&s%24m%24searchinputfield=&s%24m%24Content%24Content%24addRecipientToAnswerDD%24inp=&s%24m%24Content%24Content%24addRecipientToAnswerDD%24inpid=&s%24m%24Content%24Content%24Notification=NotifyBtnAuthor&s%24m%24Content%24Content%24RepliesToResponseAllowed=on&s%24m%24Content%24Content%24CreateAnswerHeading%24tb={urllib.parse.quote(titel)}&s%24m%24Content%24Content%24CreateAnswerDocChooser%24selectedDocumentId=&s%24m%24Content%24Content%24CreateAnswerContent%24TbxNAME%24tb={urllib.parse.quote(content)}&masterfootervalue=X1%21%C3%86%C3%98%C3%85&LectioPostbackId=")
+    print(resp.status_code)
+
+
+    #resp = self.session.get(f"https://www.lectio.dk/lectio/681/beskeder2.aspx?type=liste&elevid=54443315275")

@@ -71,3 +71,6 @@ class sdk:
 
     def forside(self):
         return _forside.forside(self)
+
+    def besvarBesked(self, message_id, id, titel, content, _from=0):
+        return _beskeder.besvarBesked(self, message_id, id, titel, content, _from)
