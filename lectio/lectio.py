@@ -5,7 +5,7 @@ TODO:
 """
 
 from .imports import *
-from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside, _ledigeLokaler
+from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside, _ledigeLokaler, _refreshCookie
 
 class sdk:
     def __init__(self, brugernavn, adgangskode, skoleId, base64Cookie=None):
@@ -78,3 +78,6 @@ class sdk:
 
     def ledigeLokaler(self):
         return _ledigeLokaler.ledigeLokaler(self)
+
+    def refreshCookie(self):
+        return _refreshCookie.refreshCookie(self)
