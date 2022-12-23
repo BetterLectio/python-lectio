@@ -61,11 +61,21 @@ def login(self):
     if not successful:
         raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
 
-    self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
-
-
 def base64Cookie(self):
-    cookie = self.session.cookies.get_dict()
-    cookie["LastLoginElevId"] = self.elevId
+    #cookie = self.session.cookies.get_dict()
+    cookie = []
+    for _cookie in self.session.cookies:
+        __cookie = str(_cookie).replace("<Cookie ", "").replace("/>", "").replace(">", "").split(" for ")
+        cookie.append({
+            "name": __cookie[0].split("=")[0],
+            "value": __cookie[0].split("=")[1],
+            "for": __cookie[1]
+        })
 
-    return base64.b64encode(json.dumps(cookie).encode())
+    cookie.append({
+        "name": "LastLoginElevId",
+        "value": self.elevId,
+        "for": "www.lectio.dk/"
+    })
+
+    return base64.b64encode(json.dumps(cookie).encode()).decode()

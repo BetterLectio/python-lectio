@@ -1,18 +1,11 @@
-from .imports import *
-
 def refreshCookie(self):
-    success = False
-    error = None
-    try:
-        headers = {
-            "cookie": f"lectiogsc={self.session.cookies['lectiogsc']}; autologinkey={self.session.cookies['autologinkey']}",
-        }
-        resp = requests.get(f"https://www.lectio.dk/lectio/{self.skoleId}/forside.aspx", headers=headers, allow_redirects=False)
-        newSessionId = resp.cookies["ASP.NET_SessionId"]
-        self.session.cookies.set('ASP.NET_SessionId', newSessionId, domain='lectio.dk', path='/')
+    del self.session.cookies["LastAuthenticatedPageLoad"]
+    del self.session.cookies["ASP.NET_SessionId"]
 
-        success = True
-    except Exception as e:
-        error = e
+    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/forside.aspx", allow_redirects=False, cookies=self.session.cookies)
+    resp = self.session.get(f"https://www.lectio.dk{resp.headers['Location']}", allow_redirects=False, cookies=self.session.cookies)
+    resp = self.session.get(f"https://www.lectio.dk{resp.headers['Location']}", allow_redirects=False, cookies=self.session.cookies)
+    if resp.status_code == 200:
+        return {"success": False}
 
-    return {"success": success, "error": error}
+    return {"success": True}

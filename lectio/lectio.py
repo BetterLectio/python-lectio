@@ -19,13 +19,13 @@ class sdk:
             self.login()
         else:
             cookie = json.loads(base64.b64decode(base64Cookie))
-            self.skoleId = cookie["LastLoginExamno"]
-            self.elevId = cookie["LastLoginElevId"]
+            for _cookie in cookie:
+                self.session.cookies.set(_cookie["name"], _cookie["value"], domain=_cookie["for"])
 
-            for identifier, value in cookie.items():
-                self.session.cookies.set(identifier, value, domain="lectio.dk")
+            self.skoleId = self.session.cookies["LastLoginExamno"]
+            self.elevId = self.session.cookies["LastLoginElevId"]
 
-            self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
+        self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
     def login(self):
         return _auth.login(self)
 
@@ -33,51 +33,115 @@ class sdk:
         return _auth.base64Cookie(self)
 
     def lektier(self):
-        return _lektier.lektier(self)
+        try:
+            return _lektier.lektier(self)
+        except Exception:
+            self.refreshCookie()
+            return _lektier.lektier(self)
 
     def skema(self, retry=False, uge=None, år=None, elevId=None):
-        return _skema.skema(self, retry=retry, uge=uge, år=år, elevId=elevId)
+        try:
+            return _skema.skema(self, retry=retry, uge=uge, år=år, elevId=elevId)
+        except Exception:
+            self.refreshCookie()
+            return _skema.skema(self, retry=retry, uge=uge, år=år, elevId=elevId)
 
     def modul(self, absid):
-        return _modul.modul(self, absid)
+        try:
+            return _modul.modul(self, absid)
+        except Exception:
+            self.refreshCookie()
+            return _modul.modul(self, absid)
 
     def opgave(self, exerciseid):
-        return _opgaver.opgave(self, exerciseid)
+        try:
+            return _opgaver.opgave(self, exerciseid)
+        except Exception:
+            self.refreshCookie()
+            return _opgaver.opgave(self, exerciseid)
     def opgaver(self):
-        return _opgaver.opgaver(self)
+        try:
+            return _opgaver.opgaver(self)
+        except Exception:
+            self.refreshCookie()
+            return _opgaver.opgaver(self)
 
     def besked(self, message_id):
-        return _beskeder.besked(self, message_id=message_id)
+        try:
+            return _beskeder.besked(self, message_id=message_id)
+        except Exception:
+            self.refreshCookie()
+            return _beskeder.besked(self, message_id=message_id)
 
     def beskeder(self, id=None):
-        return _beskeder.beskeder(self, id=id)
+        try:
+            return _beskeder.beskeder(self, id=id)
+        except Exception:
+            self.refreshCookie()
+            return _beskeder.beskeder(self, id=id)
 
     def informationer(self):
-        return _informationer.informationer(self)
+        try:
+            return _informationer.informationer(self)
+        except Exception:
+            self.refreshCookie()
+            return _informationer.informationer(self)
 
     def fåElev(self, elevId):
-        return _informationer.fåElev(self, elevId)
+        try:
+            return _informationer.fåElev(self, elevId)
+        except Exception:
+            self.refreshCookie()
+            return _informationer.fåElev(self, elevId)
 
     def fåBruger(self, brugerId):
-        return _informationer.fåBruger(self, brugerId)
+        try:
+            return _informationer.fåBruger(self, brugerId)
+        except Exception:
+            self.refreshCookie()
+            return _informationer.fåBruger(self, brugerId)
 
     def fåFil(self, filUrl):
-        return _filer.fåFil(self, filUrl)
+        try:
+            return _filer.fåFil(self, filUrl)
+        except Exception:
+            self.refreshCookie()
+            return _filer.fåFil(self, filUrl)
 
     def fravær(self):
-        return _fravær.fravær(self)
+        try:
+            return _fravær.fravær(self)
+        except Exception:
+            self.refreshCookie()
+            return _fravær.fravær(self)
 
     def dokumenter(self, folderid=None):
-        return _dokumenter.dokumenter(self, folderid)
+        try:
+            return _dokumenter.dokumenter(self, folderid)
+        except Exception:
+            self.refreshCookie()
+            return _dokumenter.dokumenter(self, folderid)
 
     def forside(self):
-        return _forside.forside(self)
+        try:
+            return _forside.forside(self)
+        except Exception:
+            self.refreshCookie()
+            return _forside.forside(self)
 
     def besvarBesked(self, message_id, id, titel, content, _from=0):
-        return _beskeder.besvarBesked(self, message_id, id, titel, content, _from)
+        try:
+            return _beskeder.besvarBesked(self, message_id, id, titel, content, _from)
+        except Exception:
+            self.refreshCookie()
+            return _beskeder.besvarBesked(self, message_id, id, titel, content, _from)
 
     def ledigeLokaler(self):
-        return _ledigeLokaler.ledigeLokaler(self)
+        try:
+            return _ledigeLokaler.ledigeLokaler(self)
+        except Exception:
+            self.refreshCookie()
+            return _ledigeLokaler.ledigeLokaler(self)
 
     def refreshCookie(self):
         return _refreshCookie.refreshCookie(self)
