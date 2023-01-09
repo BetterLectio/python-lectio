@@ -9,7 +9,10 @@ colorDict = {
 }
 
 def forside(self):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/forside.aspx?elevid={self.elevId}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/forside.aspx?elevid={self.elevId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     forsideDict = {

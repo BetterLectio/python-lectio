@@ -1,8 +1,10 @@
 from .imports import *
 
 def modul(self, absid):
-    resp = self.session.get(
-        f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     modulDetaljer = {

@@ -6,17 +6,19 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
         elevId = self.elevId
 
     if uge == None and år == None:
-        resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}"
     elif uge != None and år != None:
         uge = str(uge)
         år = str(år)
         if len(uge) == 1:
             uge = "0" + uge
-        resp = self.session.get(
-            f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}&week={uge}{år}")
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}&week={uge}{år}"
     else:
         raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
 
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     skema = {
@@ -56,19 +58,6 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
 
     successful = False
     i = 0
-
-    renameDictionary = {
-        "Lærere": "Lærer",
-        "Lokaler": "Lokale"
-    }
-
-    statusDictionary = {
-        "s2brik": "normal",
-        "s2cancelled": "aflyst",
-        "s2changed": "ændret",
-
-        "s2bgboxeksamen": "eksamen"
-    }
 
     for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
         if i != 0:

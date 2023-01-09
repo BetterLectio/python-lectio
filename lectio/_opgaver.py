@@ -2,7 +2,10 @@ from .imports import *
 from . import _utils
 
 def opgave(self, exerciseid):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/ElevAflevering.aspx?elevid={self.elevId}&exerciseid={exerciseid}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/ElevAflevering.aspx?elevid={self.elevId}&exerciseid={exerciseid}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     opgaveDict = {
@@ -74,7 +77,10 @@ def opgave(self, exerciseid):
 
     return opgaveDict
 def opgaver(self):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/OpgaverElev.aspx?elevid={self.elevId}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/OpgaverElev.aspx?elevid={self.elevId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     if str(soup.find("input", {"id": "s_m_Content_Content_CurrentExerciseFilterCB"}).get("checked")) == "checked":

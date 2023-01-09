@@ -1,7 +1,10 @@
 from .imports import *
 
 def informationer(self):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/FindSkemaAdv.aspx")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/FindSkemaAdv.aspx"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     informationerDict = {}
@@ -17,7 +20,10 @@ def informationer(self):
     return informationerDict
 
 def fåBruger(self, brugerId, hold_gruppe=True):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/contextcard/contextcard.aspx?lectiocontextcard={brugerId}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/contextcard/contextcard.aspx?lectiocontextcard={brugerId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     titel = soup.find("span").text
@@ -46,7 +52,10 @@ def fåBruger(self, brugerId, hold_gruppe=True):
     return bruger
 
 def fåElev(self, elevId):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     elev = {

@@ -2,7 +2,10 @@ from .imports import *
 from . import _utils
 
 def lektier(self):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/material_lektieoversigt.aspx?elevid={self.elevId}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/material_lektieoversigt.aspx?elevid={self.elevId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
 
     soup = BeautifulSoup(resp.text, "html.parser")
 

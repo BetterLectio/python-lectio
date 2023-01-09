@@ -1,7 +1,10 @@
 from .imports import *
 
 def dokumenter(self, folderid=None):
-    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}" if folderid == None else f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}&folderid={folderid}")
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}" if folderid == None else f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}&folderid={folderid}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     dokumenterDict = {"titel": soup.find("span", {"id": "s_m_Content_Content_FolderLabel"}).text, "indhold": []}
