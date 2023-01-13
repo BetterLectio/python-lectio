@@ -27,7 +27,7 @@ def fravær(self):
                 "hold": row[0].text,
                 "opgjort_fravær_procent": row[1].text,
                 "opgjort_fravær_moduler": row[2].text,
-                "heleåret_fravær_moduler": row[3].text,
+                "heleåret_fravær_procent": row[3].text,
                 "heleåret_fravær_moduler": row[4].text,
             })
 
