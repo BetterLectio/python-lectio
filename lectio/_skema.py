@@ -1,44 +1,64 @@
 from .imports import *
 from . import _utils
 
-def skema(self, retry=False, uge=None, år=None, elevId=None):
-    if elevId == None:
-        elevId = self.elevId
-
-    if uge == None and år == None:
-        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}"
-    elif uge != None and år != None:
-        uge = str(uge)
-        år = str(år)
-        if len(uge) == 1:
-            uge = "0" + uge
-        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?type=elev&elevid={elevId}&week={uge}{år}"
-    else:
-        raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
-
-    resp = self.session.get(url)
-    if resp.url != url:
-        raise Exception("lectio-cookie udløbet")
-    soup = BeautifulSoup(resp.text, "html.parser")
-
+def skema(self, uge=None, år=None, id=None):
     skema = {
         "modulTider": {},
         "ugeDage": [],
         "moduler": [],
-        "dagsNoter": [],
-        "hold": [],
-        "grupper": []
+        "dagsNoter": []
     }
 
-    holdOgGrupper = soup.find("div", {"id": "s_m_Content_Content_holdElementLinkList"})
-    for tr in holdOgGrupper.find_all("tr"):
-        content = tr.find_all("li")
-        if "Hold" in str(tr.find("th")):
-            for hold in content:
-                skema["hold"].append({"navn": hold.text, "id": hold.find("a").get("href").split("holdelementid=")[1]})
-        else:
-            for gruppe in content:
-                skema["grupper"].append({"navn": gruppe.text, "id": gruppe.find("a").get("href").split("holdelementid=")[1]})
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?"
+    if id == None:
+        url += f"type=elev&elevid={self.elevId}"
+        skema["hold"] = []
+        skema["grupper"] = []
+    elif id[0] == "S": # Elev
+        url += f"type=elev&elevid={id[1:]}"
+        skema["hold"] = []
+        skema["grupper"] = []
+    elif id[0] == "T": # Lærer
+        url += f"type=laerer&laererid={id[1:]}"
+        skema["hold"] = []
+    elif id[0] == "C": # Klasse
+        url += f"type=stamklasse&klasseid={id[1:]}"
+        skema["hold"] = []
+        skema["grupper"] = []
+    elif id[0:2] == "RE": # Ressource
+        url += f"type=lokale&nosubnav=1&id={id[2:]}"
+    elif id[0] == "R": # Lokale
+        url += f"type=lokale&nosubnav=1&id={id[1:]}"
+    elif id[0:2] == "HE": # Hold Element
+        url += f"type=holdelement&holdelementid={id[2:]}"
+    elif id[0] == "G": # Gruppe
+        url += f"type=holdelement&holdelementid={id[1:]}"
+
+    if uge != None and år != None:
+        uge = str(uge)
+        år = str(år)
+        if len(uge) == 1:
+            uge = "0" + uge
+        url += f"&week={uge}{år}"
+    elif uge != None or år != None:
+        raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
+
+    resp = self.session.get(url)
+
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    if id == None or id[0] == "S" or id[0] == "C":
+        holdOgGrupper = soup.find("div", {"id": "s_m_Content_Content_holdElementLinkList"})
+        for tr in holdOgGrupper.find_all("tr"):
+            content = tr.find_all("li")
+            if "Hold" in str(tr.find("th")):
+                for hold in content:
+                    skema["hold"].append({"navn": hold.text, "id": hold.find("a").get("href").split("holdelementid=")[1]})
+            else:
+                for gruppe in content:
+                    skema["grupper"].append({"navn": gruppe.text, "id": gruppe.find("a").get("href").split("holdelementid=")[1]})
 
     for modulTid in soup.find_all("div", {"class": "s2module-info"}):
         skema["modulTider"][modulTid.prettify().split("\n")[2].lstrip()] = modulTid.prettify().split("\n")[4].lstrip()
@@ -56,7 +76,6 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
             skema["dagsNoter"][i][skema["ugeDage"][i]].append(dagsNote.text.lstrip())
         i += 1
 
-    successful = False
     i = 0
 
     for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
@@ -67,13 +86,4 @@ def skema(self, retry=False, uge=None, år=None, elevId=None):
                 skema["moduler"].append(modulDict)
         i += 1
 
-    if len(skema) > 0:
-        successful = True
-
-    if successful:
-        return skema
-    elif not retry:
-        self.login()
-        return self.skema(retry=True)
-    else:
-        return False
+    return skema

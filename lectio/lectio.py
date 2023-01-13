@@ -1,7 +1,6 @@
 """
 TODO:
   * Gør elev og lærer id til id men hvor at elev id har et S foran (Eks: S123456789) og lærer har et T foran (Eks: T12345678)
-  * Fjern retry fra enkelte funktioner og gør det til en general ting
 """
 
 from .imports import *
@@ -35,8 +34,8 @@ class sdk:
     def lektier(self):
         return _lektier.lektier(self)
 
-    def skema(self, retry=False, uge=None, år=None, elevId=None):
-        return _skema.skema(self, retry=retry, uge=uge, år=år, elevId=elevId)
+    def skema(self, uge=None, år=None, id=None):
+        return _skema.skema(self, uge=uge, år=år, id=id)
 
     def modul(self, absid):
         return _modul.modul(self, absid)
