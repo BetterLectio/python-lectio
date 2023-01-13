@@ -31,6 +31,7 @@ def fåBruger(self, brugerId, hold_gruppe=True):
     bruger = {
         "navn": titel.split(" - ")[-1],
         "pictureid": None,
+        "id": soup.find_all("a")[-1].get("href").split("=")[-1],
         "type": titel.split(" - ")[0].lower()
     }
 

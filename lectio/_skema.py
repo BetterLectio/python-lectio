@@ -10,29 +10,44 @@ def skema(self, uge=None, år=None, id=None):
     }
 
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?"
+    if id[0] == "U":  # Gruppe
+        bruger = self.fåBruger(brugerId=id)
+        if bruger["type"] == "elev":
+            id = "S" + bruger["id"]
+        elif bruger["type"] == "lærer":
+            id = "T" + bruger["id"]
+
     if id == None:
         url += f"type=elev&elevid={self.elevId}"
         skema["hold"] = []
         skema["grupper"] = []
+        skema["type"] = "elev"
     elif id[0] == "S": # Elev
         url += f"type=elev&elevid={id[1:]}"
         skema["hold"] = []
         skema["grupper"] = []
+        skema["type"] = "elev"
     elif id[0] == "T": # Lærer
         url += f"type=laerer&laererid={id[1:]}"
         skema["hold"] = []
+        skema["type"] = "lærer"
     elif id[0] == "C": # Klasse
         url += f"type=stamklasse&klasseid={id[1:]}"
         skema["hold"] = []
         skema["grupper"] = []
+        skema["type"] = "klasse"
     elif id[0:2] == "RE": # Ressource
         url += f"type=lokale&nosubnav=1&id={id[2:]}"
+        skema["type"] = "ressource"
     elif id[0] == "R": # Lokale
         url += f"type=lokale&nosubnav=1&id={id[1:]}"
+        skema["type"] = "lokale"
     elif id[0:2] == "HE": # Hold Element
         url += f"type=holdelement&holdelementid={id[2:]}"
+        skema["type"] = "hold"
     elif id[0] == "G": # Gruppe
         url += f"type=holdelement&holdelementid={id[1:]}"
+        skema["type"] = "gruppe"
 
     if uge != None and år != None:
         uge = str(uge)
@@ -47,6 +62,7 @@ def skema(self, uge=None, år=None, id=None):
 
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
+
     soup = BeautifulSoup(resp.text, "html.parser")
 
     if id == None or id[0] == "S" or id[0] == "C":
@@ -59,9 +75,14 @@ def skema(self, uge=None, år=None, id=None):
             else:
                 for gruppe in content:
                     skema["grupper"].append({"navn": gruppe.text, "id": gruppe.find("a").get("href").split("holdelementid=")[1]})
+    elif id[0] == "T":
+        skema["hold"] = self.fåBruger(brugerId=id)["hold"]
+
 
     for modulTid in soup.find_all("div", {"class": "s2module-info"}):
         skema["modulTider"][modulTid.prettify().split("\n")[2].lstrip()] = modulTid.prettify().split("\n")[4].lstrip()
+
+
 
     for dag in soup.find("tr", {"class": "s2dayHeader"}).find_all("td"):
         if dag.text != "":
