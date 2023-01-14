@@ -81,5 +81,5 @@ class sdk:
     def karakterer(self):
         return _karakterer.karakterer(self)
 
-    def studieretningspræsentation(self):
-        return _studieretning.studieretningspræsentation(self)
+    def studieretningspræsentation(self, elevId=None):
+        return _studieretning.studieretningspræsentation(self, elevId=elevId)
