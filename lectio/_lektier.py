@@ -18,16 +18,29 @@ def lektier(self):
 
     for tr in soup.find_all("tr"):
         modul = tr.find("a", class_="s2skemabrik")
+        if modul is None:
+            continue
         modulDict = _utils.skemaBrikExtract(modul)
-        lektie = {
-            "dato": tr.find("th").get("b"),
-            "aktivitet": modulDict,
-            "note": tr.find_all("td")[1].text,
-            "lektier": {
-                "beskrivelse": tr.find("td", {"class": "ls-homework"}).find("a").text,
-                "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
+        try:
+            lektie = {
+                "dato": tr.find("th").get("b"),
+                "aktivitet": modulDict,
+                "note": tr.find_all("td")[1].text,
+                "lektier": {
+                    "beskrivelse": tr.find("td", {"class": "ls-homework"}).find("a").text,
+                    "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
+                }
             }
-        }
+        except:
+            lektie = {
+                "dato": tr.find("th").get("b"),
+                "aktivitet": "se modul siden",
+                "note": "se modul siden",
+                "lektier": {
+                    "beskrivelse": "se modul siden",
+                    "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
+                }
+            }
 
         lektier.append(lektie)
 
