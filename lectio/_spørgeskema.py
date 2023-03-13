@@ -38,4 +38,4 @@ def spørgeskemaer(self):
         spørgeskemaDict["id"] = re.search("id=\d+", str(tr.find("a").get("href"))).group().replace("id=", "")
         spørgeskemaerDict["åbne_for_rapportering"].append(spørgeskemaDict)
 
-    print(spørgeskemaerDict)
+    return spørgeskemaerDict
