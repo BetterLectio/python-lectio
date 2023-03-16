@@ -3,6 +3,7 @@ from . import _utils
 
 def skema(self, uge=None, år=None, id=None):
     skema = {
+        "overskrift": "",
         "modulTider": {},
         "ugeDage": [],
         "moduler": [],
@@ -10,7 +11,7 @@ def skema(self, uge=None, år=None, id=None):
     }
 
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?"
-    if id[0] == "U":  # Gruppe
+    if id[0] == "U":
         bruger = self.fåBruger(brugerId=id)
         if bruger["type"] == "elev":
             id = "S" + bruger["id"]
@@ -31,6 +32,7 @@ def skema(self, uge=None, år=None, id=None):
         url += f"type=laerer&laererid={id[1:]}"
         skema["hold"] = []
         skema["type"] = "lærer"
+
     elif id[0] == "C": # Klasse
         url += f"type=stamklasse&klasseid={id[1:]}"
         skema["hold"] = []
@@ -64,6 +66,8 @@ def skema(self, uge=None, år=None, id=None):
         raise Exception("lectio-cookie udløbet")
 
     soup = BeautifulSoup(resp.text, "html.parser")
+
+    skema["overskrift"] = soup.find("div", {"id": "s_m_HeaderContent_MainTitle"}).text
 
     if id == None or id[0] == "S" or id[0] == "C":
         holdOgGrupper = soup.find("div", {"id": "s_m_Content_Content_holdElementLinkList"})
