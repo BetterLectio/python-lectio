@@ -27,8 +27,8 @@ def fravær(self):
                 "hold": row[0].text,
                 "opgjort_fravær_procent": row[1].text,
                 "opgjort_fravær_moduler": row[2].text,
-                "heleåret_fravær_procent": row[3].text,
-                "heleåret_fravær_moduler": row[4].text,
+                "for_året_fravær_procent": row[3].text,
+                "for_året_fravær_moduler": row[4].text,
             })
 
     resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/subnav/fravaerelev_fravaersaarsager.aspx?elevid={self.elevId}")
