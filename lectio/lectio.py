@@ -15,7 +15,8 @@ class sdk:
             self.adgangskode = adgangskode
             self.skoleId = skoleId
 
-            self.login()
+            if not self.login():
+                return False
         else:
             cookie = json.loads(base64.b64decode(base64Cookie))
             for _cookie in cookie:
