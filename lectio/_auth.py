@@ -53,13 +53,19 @@ def login(self):
     soup = BeautifulSoup(resp.text, "html.parser")
 
     successful = False
+    logedIn = False
     for meta in soup.find_all({"meta": {"name": "msapplication-starturl"}}):
         if f"/lectio/{self.skoleId}/forside.aspx?" in str(meta.get("content")):
-            self.elevId = meta.get("content").split("?elevid=")[1]
+            logedIn = True
+        if self.elevId := meta.get("content").split("?elevid=")[1]:
             successful = True
             break
-    if not successful:
+    if not successful and logedIn:
         raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
+    if not logedIn:
+        return False
+    if logedIn and successful:
+        return True
 
 def base64Cookie(self):
     #cookie = self.session.cookies.get_dict()
