@@ -86,3 +86,6 @@ class sdk:
 
     def spørgeskemaer(self):
         return _spørgeskema.spørgeskemaer(self)
+
+    def opretMappe(self, folderName, folderComment, folderId):
+        return _dokumenter.opretMappe(self, folderName, folderComment, folderId)

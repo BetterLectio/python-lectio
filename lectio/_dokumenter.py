@@ -1,4 +1,29 @@
 from .imports import *
+from . import _utils
+
+def opretMappe(self, folderName, folderComment, folderId):
+    url = f"https://www.lectio.dk/lectio/681/DokumentFolderRediger.aspx?parentfolderid={folderId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    payload = _utils.generatePayload(soup, "m$Content$SaveButtonsRow$svbtn")
+    payload["__EVENTARGUMENT"] = ""
+    payload["__LASTFOCUS"] = ""
+    payload["m$searchinputfield"] = ""
+    payload["LectioPostbackId"] = ""
+    payload["m$Content$EditFolderName$tb"] = folderName
+    payload["m$Content$EditFolderComments"] = folderComment
+    payload["m$Content$FolderBox$ctl03"] = folderId
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/681/DokumentFolderRediger.aspx?parentfolderid={folderId}", data="&".join([f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}" for key, value in payload.items()]), allow_redirects=False)
+    if resp.status_code == 303:
+        return {"success": True}
+    else:
+        raise Exception("Oprettelsen af mappen var ikke succesfuld")
+
+
 
 def dokumenter(self, folderid=None):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}" if folderid == None else f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}&folderid={folderid}"
