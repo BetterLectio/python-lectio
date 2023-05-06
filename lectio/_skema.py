@@ -120,4 +120,4 @@ def holdTilFag(self, holdId):
         raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    return soup.find("td", {"class": "textTop"}).find_all("td")[1].text
+    return {"fag": soup.find("td", {"class": "textTop"}).find_all("td")[1].text}
