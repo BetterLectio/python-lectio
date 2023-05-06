@@ -112,3 +112,12 @@ def skema(self, uge=None, år=None, id=None):
         i += 1
 
     return skema
+
+def holdTilFag(self, holdId):
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/contextcard/contextcard.aspx?lectiocontextcard={holdId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    return soup.find("td", {"class": "textTop"}).find_all("td")[1].text

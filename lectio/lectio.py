@@ -89,3 +89,6 @@ class sdk:
 
     def opretMappe(self, folderName, folderComment, folderId):
         return _dokumenter.opretMappe(self, folderName, folderComment, folderId)
+
+    def holdTilFag(self, holdId):
+        return _skema.holdTilFag(self, holdId)

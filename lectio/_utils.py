@@ -36,6 +36,7 @@ def skemaBrikExtract(skemabrik):
         "navn": None,
         "tidspunkt": None,
         "hold": None,
+        "hold_id": None,
         "lærer": None,
         "lokale": None,
         "status": "normal",
@@ -65,6 +66,11 @@ def skemaBrikExtract(skemabrik):
                 modulDict["tidspunkt"] = modulDetalje
             except Exception:
                 modulDict["navn"] = modulDetalje.split(": ")[0]
+
+    try:
+        modulDict["hold_id"] = re.search('data-lectiocontextcard="HE[0-9]+', str(skemabrik)).group().replace("data-lectiocontextcard=\"", "")
+    except Exception:
+        pass
 
     try:
         modulDict["andet"] = skemabrik["data-additionalinfo"].split("\n\n")[1]
