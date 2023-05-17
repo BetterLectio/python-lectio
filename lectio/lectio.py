@@ -78,8 +78,8 @@ class sdk:
     def ledigeLokaler(self):
         return _ledigeLokaler.ledigeLokaler(self)
 
-    def karakterer(self):
-        return _karakterer.karakterer(self)
+    def karakterer(self, mode="type"):
+        return _karakterer.karakterer(self, mode)
 
     def studieretningspræsentation(self, elevId=None):
         return _studieretning.studieretningspræsentation(self, elevId=elevId)
