@@ -19,7 +19,8 @@ def forside(self):
         "aktuelt": [],
         "kommunikation": {"beskeder": [], "dokumenter": []},
         "undervisning": {},
-        "skema": []
+        "skema": [],
+        "eksamener": []
     }
 
     try:
@@ -79,5 +80,17 @@ def forside(self):
 
     for modul in soup.find("div", {"id": "s_m_Content_Content_skemaIsland_pa"}).find_all("a", {"class": "s2skemabrik"}):
         forsideDict["skema"].append(_utils.skemaBrikExtract(modul))
+
+    try:  
+        eksamener_table = soup.find("table", {"id": "s_m_Content_Content_EksamenerInfo"})
+        for row in eksamener_table.find_all("tr"):
+            tds = row.find_all("td")
+            forsideDict["eksamener"].append({
+                "navn": tds[1].text,
+                "link": "https://www.lectio.dk" + tds[1].find("a").get("href"),
+                "punkt_farve": colorDict[tds[0].find("img").get("src").split("/")[-1]],
+            })
+    except Exception:
+        pass
 
     return forsideDict
