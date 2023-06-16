@@ -81,8 +81,8 @@ class sdk:
     def eksamener(self):
         return _eksamener.eksamener(self)
     
-    def karakterer(self, mode="type"):
-        return _karakterer.karakterer(self, mode)
+    def karakterer(self):
+        return _karakterer.karakterer(self)
 
     def studieretningspræsentation(self, elevId=None):
         return _studieretning.studieretningspræsentation(self, elevId=elevId)
