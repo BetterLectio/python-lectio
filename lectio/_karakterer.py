@@ -1,5 +1,4 @@
 from .imports import *
-import pprint
 
 def get_grades(soup: BeautifulSoup, mode="type"):
     """Get a list of grades from a BeautifulSoup object
@@ -109,6 +108,16 @@ def _karakterer(self, mode):
 
 def karakterer(self):
     karaktererDict = {
+        "oversigt": {
+            "karakterblad": {
+                "gennemsnit": None,
+                "karakterer": None,
+            },
+            "protokollinjer": {
+                "gennemsnit": None,
+                "karakterer": None,
+            },
+        },
         "karakterblad": [],
         "karakternoter": [],
         "protokollinjer": [],
@@ -141,15 +150,25 @@ def karakterer(self):
     # KARAKTERER
     rows = karaktermeddelelse[1].find_all("tr")
     headers = [header.text.lower() for header in rows[0].find_all("th")]
+    karakterSum = 0
+    vægtningSum = 0
     for row in rows[2:]:
         td = row.find_all("td")
         karakter = dict([(headers[i], td[i].text.strip()) for i in range(len(td))])
         karakter["vægtning"] = vægtning[f"{karakter['fag']}{' ' + karakter['niveau'] if karakter['niveau'] != '-' else ''}, {karakter['evalueringsform']}"] # Håber det er standardized på alle skoler
         karaktererDict["karakterblad"].append(karakter)
 
+        karakterSum += float(karakter["karakter"]) * float(karakter["vægtning"].replace(",", "."))
+        vægtningSum += float(karakter["vægtning"].replace(",", "."))
+
+    karaktererDict["oversigt"]["karakterblad"]["gennemsnit"] = karakterSum/vægtningSum
+    karaktererDict["oversigt"]["karakterblad"]["karakterer"] = len(rows[2:])
+
     # PROTOKOLLINJER
     rows = oversigtSoup.find("div", {"id": "printareaprotocolgrades"}).find_all("tr")
     headers = [header.text.lower().replace(" ", "_").replace("\xad", "") for header in rows[0].find_all("th")]
+    karakterSum = 0
+    vægtningSum = 0
     for row in rows[1:]:
         td = row.find_all("td")
         karakter = {}
@@ -161,6 +180,11 @@ def karakterer(self):
                 karakter[headers[i]] = td[i].text
 
         karaktererDict["protokollinjer"].append(karakter)
+        karakterSum += float(karakter["karakter"]) * float(karakter["vægt"].replace(",", "."))
+        vægtningSum += float(karakter["vægt"].replace(",", "."))
+
+    karaktererDict["oversigt"]["protokollinjer"]["gennemsnit"] = karakterSum/vægtningSum
+    karaktererDict["oversigt"]["protokollinjer"]["karakterer"] = len(rows[1:])
 
     # KARAKTERNOTER
     rows = oversigtSoup.find("div", {"id": "s_m_Content_Content_karakterView_LectioDetailIsland2_pa"}).find_all("tr")
