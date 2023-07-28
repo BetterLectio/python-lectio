@@ -27,6 +27,7 @@ def login(self):
     payload["__EVENTTARGET"] = "m$Content$submitbtn2"
     payload["m$Content$username"] = self.brugernavn
     payload["m$Content$password"] = self.adgangskode
+    payload["m$ChooseTerm$term"] = "2023"
     payload["m$Content$AutologinCbx"] = "on"
     payload["LectioPostbackId"] = ""
 
