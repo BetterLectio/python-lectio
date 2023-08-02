@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def get_grades(soup: BeautifulSoup, mode="type"):
     """Get a list of grades from a BeautifulSoup object
@@ -131,16 +132,34 @@ def karakterer(self):
         raise Exception("lectio-cookie udløbet")
     oversigtSoup = BeautifulSoup(resp.text, "html.parser")
 
+    # VÆGTNING
+    vægtning = {}
+    for row in oversigtSoup.find("div", {"id": "s_m_Content_Content_karakterView_LectioDetailIsland1_pa"}).find_all("tr")[1:]:
+        vægtning[row.find_all("td")[1].text.replace("SAM", "Samlet vurdering")] = row.find("div", {"class": "textCenter"}).get("title").split("\n")[2].split(": ")[1] # Håber det er standardized på alle skoler
+
+    _terminer = oversigtSoup.find("select", {"name": "s$m$ChooseTerm$term"})
+    selected = _terminer.find("option", {"selected": "selected"}).get("value")
+    terminer = dict([[termin.get("value"), termin.text] for termin in _terminer.find_all("option")])
+    del terminer[selected]
+
+    payload = _utils.generatePayload(oversigtSoup, "s$m$ChooseTerm$term")
+    payload["__EVENTARGUMENT"] = ""
+    payload["__LASTFOCUS"] = ""
+    payload["m$searchinputfield"] = ""
+    payload["LectioPostbackId"] = ""
+
+    for termin in terminer:
+        payload["s$m$ChooseTerm$term"] = str(termin)
+        resp = self.session.post(url, data="&".join([f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}" for key, value in payload.items()]), allow_redirects=False)
+        oversigtSoup = BeautifulSoup(resp.text, "html.parser")
+        for row in oversigtSoup.find("div", {"id": "s_m_Content_Content_karakterView_LectioDetailIsland1_pa"}).find_all("tr")[1:]:
+            vægtning[row.find_all("td")[1].text.replace("SAM", "Samlet vurdering")] = row.find("div", {"class": "textCenter"}).get("title").split("\n")[2].split(": ")[1] # Håber det er standardized på alle skoler
+
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/grades/grade_karakterblad.aspx?elevid={self.elevId}"
     resp = self.session.get(url)
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
     karakterbladSoup = BeautifulSoup(resp.text, "html.parser")
-
-    # VÆGTNING
-    vægtning = {}
-    for row in oversigtSoup.find("div", {"id": "s_m_Content_Content_karakterView_LectioDetailIsland1_pa"}).find_all("tr")[1:]:
-        vægtning[row.find_all("td")[1].text.replace("SAM", "Samlet vurdering")] = row.find("div", {"class": "textCenter"}).get("title").split("\n")[2].split(": ")[1] # Håber det er standardized på alle skoler
 
     karaktermeddelelse = karakterbladSoup.find("div", {"id": "s_m_Content_Content_karaktermeddelseIsland_pa"}).find_all("table")
 
