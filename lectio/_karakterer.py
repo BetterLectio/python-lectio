@@ -155,6 +155,10 @@ def karakterer(self):
         for row in oversigtSoup.find("div", {"id": "s_m_Content_Content_karakterView_LectioDetailIsland1_pa"}).find_all("tr")[1:]:
             vægtning[row.find_all("td")[1].text.replace("SAM", "Samlet vurdering")] = row.find("div", {"class": "textCenter"}).get("title").split("\n")[2].split(": ")[1] # Håber det er standardized på alle skoler
 
+    payload["s$m$ChooseTerm$term"] = str(selected)
+    self.session.post(url, data="&".join([f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}" for key, value in payload.items()]), allow_redirects=False)
+    
+
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/grades/grade_karakterblad.aspx?elevid={self.elevId}"
     resp = self.session.get(url)
     if resp.url != url:
