@@ -11,11 +11,6 @@ def lektier(self):
 
     lektier = []
 
-    renameDictionary = {
-        "Lærere": "Lærer",
-        "Lokaler": "Lokale"
-    }
-
     for tr in soup.find_all("tr"):
         modul = tr.find("a", class_="s2skemabrik")
         if modul is None:
@@ -26,11 +21,17 @@ def lektier(self):
                 "dato": tr.find("th").get("b"),
                 "aktivitet": modulDict,
                 "note": tr.find_all("td")[1].text,
-                "lektier": {
+            }
+            if tr.find("td", {"class": "ls-homework"}).find("a"):
+                lektie["lektier"] = {
                     "beskrivelse": tr.find("td", {"class": "ls-homework"}).find("a").text,
                     "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
                 }
-            }
+            else:
+                lektie["lektier"] = {
+                    "beskrivelse": tr.find("td", {"class": "ls-homework"}).text,
+                    "link": f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={modulDict['absid']}&elevid={self.elevId}" # næsten det samme alligevel
+                }
         except:
             lektie = {
                 "dato": tr.find("th").get("b"),
@@ -38,7 +39,7 @@ def lektier(self):
                 "note": "se modul siden",
                 "lektier": {
                     "beskrivelse": "se modul siden",
-                    "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
+                    "link": "se modul siden"
                 }
             }
 
