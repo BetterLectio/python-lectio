@@ -65,8 +65,8 @@ def opgave(self, exerciseid):
         indlæg = {}
         i = 0
         for td in tr.find_all("td"):
-            if (identifier := indlægHeader[i]) == "dokument" and (href := td.find("a").get('href')) != None:
-                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}](https://www.lectio.dk{href})"
+            if (identifier := indlægHeader[i]) == "dokument" and td.find("a") != None:
+                indlæg[identifier] = f"[{td.text.lstrip().rstrip()}](https://www.lectio.dk{td.find('a').get('href')})"
             elif identifier == "bruger":
                 indlæg[identifier] = {"navn": td.text.lstrip().rstrip(), "bruger_id": td.find("span").get("data-lectiocontextcard")}
             else:
