@@ -105,17 +105,23 @@ def fravær(self):
 
             tds = tr.find_all("td")
 
+            registreretLærer = tds[4].text.lstrip().split("\n\t\t\t\t\t\t")
+            årsagÅrsagsnote = tds[6].text.lstrip().split("\n\t\t\t\t\t\t")
+            if len(årsagÅrsagsnote) == 1:
+                årsagÅrsagsnote.append("")
+
             fravær["moduler"]["oversigt"].append({
-                "type": tds[0].text.lstrip(),
-                "uge": tds[1].text.lstrip(),
+                "type": "Lektion", # De har fjernet det fra tabellen, måske skal vi også gøre det samme.
+                "uge": tds[0].text.lstrip(),
                 "aktivitet": modulDict,
-                "fravær": tds[3].text.lstrip(),
-                "fraværstype": tds[4].text.lstrip(),
-                "registreret": tds[5].text.lstrip(),
-                "lærer": tds[6].text.lstrip(),
-                "bemærkning": tds[7].text.lstrip(),
-                "årsag": tds[8].text.lstrip(),
-                "årsagsnote": tds[9].text.lstrip(),
+                "fravær": tds[2].text.lstrip(),
+                "fraværstype": tds[3].text.lstrip(),
+                "registreret": registreretLærer[0],
+                "lærer": registreretLærer[1],
+                "bemærkning": tds[5].text.lstrip(),
+                "årsag": årsagÅrsagsnote[0],
+                "årsagsnote": årsagÅrsagsnote[1],
             })
+            print(fravær["moduler"]["oversigt"])
 
     return fravær
