@@ -116,12 +116,11 @@ def fravær(self):
                 "aktivitet": modulDict,
                 "fravær": tds[2].text.lstrip(),
                 "fraværstype": tds[3].text.lstrip(),
-                "registreret": registreretLærer[0],
+                "registreret": registreretLærer[0].rstrip(),
                 "lærer": registreretLærer[1],
                 "bemærkning": tds[5].text.lstrip(),
-                "årsag": årsagÅrsagsnote[0],
+                "årsag": årsagÅrsagsnote[0].rstrip(),
                 "årsagsnote": årsagÅrsagsnote[1],
             })
-            print(fravær["moduler"]["oversigt"])
 
     return fravær
