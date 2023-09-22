@@ -78,4 +78,10 @@ def base64Cookie(self):
         "for": "www.lectio.dk/"
     })
 
+    cookie.append({
+        "name": "LastLoginExamno",
+        "value": self.skoleId,
+        "for": "www.lectio.dk/"
+    })
+
     return base64.b64encode(json.dumps(cookie).encode()).decode()
