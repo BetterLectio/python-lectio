@@ -23,7 +23,7 @@ def modul(self, absid):
     modulContent = soup.find("div", {"id": "s_m_Content_Content_tocAndToolbar_inlineHomeworkDiv"})
     last = ""
     for div in modulContent.find_all("div"):
-        if div.get("style") == None:
+        if div.get("id") == None:
             if (divText := div.text.lstrip().rstrip()) != "":
                 last = divText.lower().title().replace(" ", "")
                 last = last[0].lower() + last[1:]
