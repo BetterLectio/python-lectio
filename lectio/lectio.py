@@ -101,3 +101,6 @@ class sdk:
 
     def ændreTermin(self, terminId):
         return _termin.ændreTermin(self, terminId)
+
+    def spørgeskema(self, id):
+        return _spørgeskema.spørgeskema(self, id)
