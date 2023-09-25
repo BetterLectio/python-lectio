@@ -52,6 +52,7 @@ def spørgeskema(self, id):
     formatted_spørgeskema = []
     for spørgsmål in _spørgeskema.find_all("tr")[1:]:
         content = spørgsmål.find("td").findChildren()
+
         spørgeskemaDict = {
             "titel": content[0].text,
             "tekst": None,
@@ -75,7 +76,7 @@ def spørgeskema(self, id):
         tekst = content[1].find_all("div", {"class": "ls-questionnaire-question-text"})
         if len(tekst) == 2: # Så er det en udvidet beskrivelse
             tekst = tekst[1]
-            spørgeskemaDict["tekst"] = "Da BetterLectio stadig er under udvikling er formatering ikke optimal.\n\n" + tekst[0].text.strip()
+            spørgeskemaDict["tekst"] = "Da BetterLectio stadig er under udvikling er formatering ikke optimal.\n\n" + tekst.text.strip()
             # TO DO: Udvidet tekst skraber
         else:
             spørgeskemaDict["tekst"] = tekst[0].text.strip()

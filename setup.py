@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-VERSION = '1.22.9'
+VERSION = '1.23.0'
 DESCRIPTION = 'En SDK til gymnasie siden Lectio'
 long_description = (Path(__file__).parent / "README.md").read_text()
 
