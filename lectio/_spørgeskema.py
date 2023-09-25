@@ -83,4 +83,17 @@ def spørgeskema(self, id):
 
         formatted_spørgeskema.append(spørgeskemaDict)
 
-    return formatted_spørgeskema
+    info = soup.find("div", {"class": "ls-questionnaire-question-section-content"}).find_all("tr")
+    afsender = info[1].find("td")
+
+    spørgeskemaDict = {
+        "titel": info[0].find("td").text.strip(),
+        "afstender": {
+            "navn": afsender.text.strip(),
+            "id": afsender.find("span").get("data-lectiocontextcard")
+        },
+        "anonym": True if info[2].find("td").text.strip() == "Ja" else False,
+        "indhold": formatted_spørgeskema
+    }
+
+    return spørgeskemaDict
