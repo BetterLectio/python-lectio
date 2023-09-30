@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def spørgeskemaer(self):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/spoergeskema/spoergeskema_rapport.aspx?type=mine&elevid={self.elevId}"
@@ -58,18 +59,25 @@ def spørgeskema(self, id):
             "tekst": None,
             "svar": {
                 "type": None,
+                "id": None,
                 "muligheder": []
             }
         }
 
         if content[1].find("div", {"class": "ls-questionnaire-answer-text"}) != None:
             spørgeskemaDict["svar"]["type"] = "tekstfelt"
+            spørgeskemaDict["svar"]["id"] = content[1].find("textarea").get("name")
         elif (options := content[1].find("div", {"class": "ls-questionnaire-answer-option"})) != None:
+            mulighed = {"tekst": "", "id": ""}
             for option in options.find("span").findChildren():
                 if option.name == "label":
-                    spørgeskemaDict["svar"]["muligheder"].append(option.text)
+                    mulighed["tekst"] = option.text
+                    spørgeskemaDict["svar"]["muligheder"].append(mulighed)
+                    mulighed = {"tekst": "", "id": ""}
 
                 elif option.name == "input":
+                    mulighed["id"] = option.get('value')
+                    spørgeskemaDict["svar"]["id"] = option.get('name')
                     spørgeskemaDict["svar"]["type"] = option.get("type")
 
 
@@ -97,3 +105,15 @@ def spørgeskema(self, id):
     }
 
     return spørgeskemaDict
+
+def besvarSpørgeskema(self, id, besvarelser):
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/spoergeskema/spoergeskema_besvar.aspx?id={id}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    headers = _utils.generatePayload(soup, "m$Content$answercompletebt")
+    headers.update(besvarelser)
+
+    print(headers)

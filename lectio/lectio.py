@@ -104,3 +104,6 @@ class sdk:
 
     def spørgeskema(self, id):
         return _spørgeskema.spørgeskema(self, id)
+
+    def besvarSpørgeskema(self, id, besvarelser):
+        return _spørgeskema.besvarSpørgeskema(self, id, besvarelser)
