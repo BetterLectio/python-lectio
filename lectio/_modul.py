@@ -24,7 +24,7 @@ def modul(self, absid):
     last = ""
     for div in modulContent.find_all("div"):
         if div.get("id") == None:
-            if (divText := div.text.lstrip().rstrip()) != "":
+            if (divText := div.text.lstrip().rstrip()) != "" and divText != "Vis fuld skærm":
                 last = divText.lower().title().replace(" ", "")
                 last = last[0].lower() + last[1:]
         else:
