@@ -113,7 +113,25 @@ def besvarSpørgeskema(self, id, besvarelser):
         raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    headers = _utils.generatePayload(soup, "m$Content$answercompletebt")
-    headers.update(besvarelser)
+    payload = _utils.generatePayload(soup, "m$Content$answercompletebt")
+    payload["__EVENTARGUMENT"] = ""
+    payload["__LASTFOCUS"] = ""
+    payload["searchinputfield"] = ""
+    payload.update(besvarelser)
+    payload["LectioPostbackId"] = ""
 
-    print(headers)
+    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value.replace(' ', '+'))}" for key, value in payload.items())
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/spoergeskema/spoergeskema_besvar.aspx?id={id}&prevurl=spoergeskema%2fspoergeskema_rapport.aspx", data=payloadEncoded)
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    payload = _utils.generatePayload(soup, "m$Content$answercompletebt")
+    payload.update(besvarelser)
+    payload["__EVENTARGUMENT"] = "xxconfirmed_"
+    payload["m$searchinputfield"] = ""
+    payload["LectioPostbackId"] = ""
+    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value.replace(' ', '+'))}" for key, value in payload.items())
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/spoergeskema/spoergeskema_besvar.aspx?id={id}&prevurl=spoergeskema%2fspoergeskema_rapport.aspx", allow_redirects=False, data=payloadEncoded)
+
+    if resp.status_code == 303:
+        return {"success": True}
