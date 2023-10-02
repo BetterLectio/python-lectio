@@ -3,10 +3,12 @@ from .imports import *
 def generatePayload(soup, eventTarget):
     payload = {}
     for _input in soup.find("form", {"id": "aspnetForm"}).find_all("input", {"type": "hidden"}):
-        id = _input.get("id")
+        id = _input.get("name")
         if id == None:
-            id = _input.get("name")
+            id = _input.get("id")
         payload[id] = _input.get("value")
+        if payload[id] == None:
+            payload[id] = ""
     payload["__EVENTTARGET"] = eventTarget
 
     return payload

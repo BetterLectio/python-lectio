@@ -137,19 +137,30 @@ def besvarBesked(self, message_id, id, titel, content, _from):
     soup = BeautifulSoup(resp.text, "html.parser")
 
     payload = _utils.generatePayload(soup, "__Page")
-    payload["__EVENTARGUMENT"] = id
+    payload["__EVENTARGUMENT"] = f"ANSWERMESSAGE_{id}"
     payload["__LASTFOCUS"] = ""
     payload["s$m$searchinputfield"] = ""
     payload["s$m$Content$Content$SPSearchText$tb"] = ""
     payload["LectioPostbackId"] = ""
 
-
-    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={self.elevId}", data=payload)
+    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={self.elevId}", data=payloadEncoded)
     soup = BeautifulSoup(resp.text, "html.parser")
 
     payload = _utils.generatePayload(soup, "s$m$Content$Content$CreateAnswerOKBtn")
+    payload["__LASTFOCUS"] = ""
+    payload["__EVENTARGUMENT"] = ""
+    payload["s$m$searchinputfield"] = ""
+    payload["s$m$Content$Content$addRecipientToAnswerDD$inp"] = "" # Skal tilføjes som option
+    payload["s$m$Content$Content$Notification"] = "NotifyBtnAuthor" # Skal tilføjes som option
+    payload["s$m$Content$Content$RepliesToResponseAllowed"] = "on" # Skal tilføjes som option
+    payload["s$m$Content$Content$CreateAnswerHeading$tb"] = titel
+    payload["s$m$Content$Content$CreateAnswerContent$TbxNAME$tb"] = content
+    payload["LectioPostbackId"] = ""
 
-    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={message_id}", data=f"__LASTFOCUS=&time=0&__EVENTTARGET=s%24m%24Content%24Content%24CreateAnswerOKBtn&__EVENTARGUMENT=&__SCROLLPOSITION=&__VIEWSTATEX={urllib.parse.quote(payload['__VIEWSTATEX'])}&__VIEWSTATEY_KEY=&__VIEWSTATE=&__VIEWSTATEENCRYPTED=&s%24m%24searchinputfield=&s%24m%24Content%24Content%24addRecipientToAnswerDD%24inp=&s%24m%24Content%24Content%24addRecipientToAnswerDD%24inpid=&s%24m%24Content%24Content%24Notification=NotifyBtnAuthor&s%24m%24Content%24Content%24RepliesToResponseAllowed=on&s%24m%24Content%24Content%24CreateAnswerHeading%24tb={urllib.parse.quote(titel)}&s%24m%24Content%24Content%24CreateAnswerDocChooser%24selectedDocumentId=&s%24m%24Content%24Content%24CreateAnswerContent%24TbxNAME%24tb={urllib.parse.quote(content)}&masterfootervalue=X1%21%C3%86%C3%98%C3%85&LectioPostbackId=", allow_redirects=False)
+    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={message_id}", data=payloadEncoded, allow_redirects=False)
 
     if resp.status_code == 303:
         return {"success": True}

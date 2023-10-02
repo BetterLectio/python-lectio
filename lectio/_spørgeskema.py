@@ -120,7 +120,7 @@ def besvarSpørgeskema(self, id, besvarelser):
     payload.update(besvarelser)
     payload["LectioPostbackId"] = ""
 
-    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value.replace(' ', '+'))}" for key, value in payload.items())
+    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
     resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/spoergeskema/spoergeskema_besvar.aspx?id={id}&prevurl=spoergeskema%2fspoergeskema_rapport.aspx", data=payloadEncoded)
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -129,7 +129,7 @@ def besvarSpørgeskema(self, id, besvarelser):
     payload["__EVENTARGUMENT"] = "xxconfirmed_"
     payload["m$searchinputfield"] = ""
     payload["LectioPostbackId"] = ""
-    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value.replace(' ', '+'))}" for key, value in payload.items())
+    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
 
     resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/spoergeskema/spoergeskema_besvar.aspx?id={id}&prevurl=spoergeskema%2fspoergeskema_rapport.aspx", allow_redirects=False, data=payloadEncoded)
 
