@@ -137,7 +137,7 @@ def besvarBesked(self, message_id, id, titel, content, _from):
     soup = BeautifulSoup(resp.text, "html.parser")
 
     payload = _utils.generatePayload(soup, "__Page")
-    payload["__EVENTARGUMENT"] = f"ANSWERMESSAGE_{id}"
+    payload["__EVENTARGUMENT"] = id
     payload["__LASTFOCUS"] = ""
     payload["s$m$searchinputfield"] = ""
     payload["s$m$Content$Content$SPSearchText$tb"] = ""
