@@ -21,7 +21,7 @@ def ledigeLokaler(self):
 
     return ledigeLokalerDict
 
-def bedreLedigeLokaler(self):
+def optagedeLokaler(self):
     lokaler = list(self.informationer()["lokaler"].values())
 
     requests = len(lokaler)/30
