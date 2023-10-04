@@ -35,7 +35,8 @@ def bedreLedigeLokaler(self):
         urls.append(f"https://www.lectio.dk/lectio/681/SkemaAvanceret.aspx?type=skema&lokalesel={','.join(lokaler[0:30]).replace('RO', '')}")
         lokaler = lokaler[30:]
 
-    for url in urls[:1]:
+    lokaler = {}
+    for url in urls:
         resp = self.session.get(url)
         if resp.url != url:
             raise Exception("lectio-cookie udløbet")
@@ -48,5 +49,10 @@ def bedreLedigeLokaler(self):
                 for modul in dag.find_all("a", class_="s2skemabrik"):
                     modulDict = _utils.skemaBrikExtract(modul)
                     if modulDict["status"] != "aflyst":
-                        print(modulDict)
+                        try:
+                            lokaler[modulDict["lokale"]].append(modulDict["tidspunkt"])
+                        except KeyError:
+                            lokaler[modulDict["lokale"]] = [modulDict["tidspunkt"]]
             i += 1
+
+    return lokaler
