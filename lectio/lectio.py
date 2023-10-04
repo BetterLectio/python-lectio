@@ -107,3 +107,6 @@ class sdk:
 
     def besvarSpørgeskema(self, id, besvarelser):
         return _spørgeskema.besvarSpørgeskema(self, id, besvarelser)
+
+    def bedreLedigeLokaler(self):
+        return _ledigeLokaler.bedreLedigeLokaler(self)
