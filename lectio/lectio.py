@@ -108,5 +108,5 @@ class sdk:
     def besvarSpørgeskema(self, id, besvarelser):
         return _spørgeskema.besvarSpørgeskema(self, id, besvarelser)
 
-    def lokaleDagsorden(self):
-        return _ledigeLokaler.lokaleDagsorden(self)
+    def lokaleDagsorden(self, kunAktuelAfdeling=True):
+        return _ledigeLokaler.lokaleDagsorden(self, kunAktuelAfdeling)

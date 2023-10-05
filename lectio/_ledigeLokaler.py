@@ -21,12 +21,31 @@ def ledigeLokaler(self):
 
     return ledigeLokalerDict
 
-def lokaleDagsorden(self):
+def lokaleDagsorden(self, kunAktuelAfdeling=True):
     informationer = self.informationer()
     lokaler = list(informationer["lokaler"].values())
     lokaleNavne = list(informationer["lokaler"].keys())
 
-    lokaleList = [{"navn": lokale, "id": id, "moduler": []} for lokale, id in informationer["lokaler"].items()]
+    afdelingsLokaler = []
+    afdelingsLokalerNavne = []
+    if kunAktuelAfdeling:
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaAvanceret.aspx?type=aktuelleallelokaler&nosubnav=1&prevurl=FindSkemaAdv.aspx"
+        resp = self.session.get(url)
+        if resp.url != url:
+            raise Exception("lectio-cookie udløbet")
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for div in soup.find("div", {"id": "m_Content_LectioDetailIsland1_pa"}).find_all("div"):
+            try:
+                if div.get("id").startswith("printSingleControl"):
+                    afdelingsLokaler.append(lokaler[lokaleNavne.index(div.find("span").text[7:])])
+                    afdelingsLokalerNavne.append(div.find("span").text[7:])
+            except:
+                pass
+
+        lokaler = afdelingsLokaler
+        lokaleNavne = afdelingsLokalerNavne
+
+    lokaleList = [{"navn": lokaleNavne[i], "id": lokaler[i], "moduler": []} for i in range(len(lokaler))]
 
     requests = len(lokaler) / 30
     if requests - int(requests) == 0:
