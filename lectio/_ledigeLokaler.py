@@ -49,10 +49,12 @@ def optagedeLokaler(self):
                 for modul in dag.find_all("a", class_="s2skemabrik"):
                     modulDict = _utils.skemaBrikExtract(modul)
                     if modulDict["status"] != "aflyst":
-                        try:
-                            lokaler[modulDict["lokale"]].append(modulDict["tidspunkt"])
-                        except KeyError:
-                            lokaler[modulDict["lokale"]] = [modulDict["tidspunkt"]]
+                        _lokaler = modulDict["lokale"].split(", ")
+                        for lokale in _lokaler:
+                            try:
+                                lokaler[lokale].append(modulDict["tidspunkt"])
+                            except KeyError:
+                                lokaler[lokale] = [modulDict["tidspunkt"]]
             i += 1
 
     return lokaler
