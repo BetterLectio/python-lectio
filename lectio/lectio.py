@@ -108,5 +108,5 @@ class sdk:
     def besvarSpørgeskema(self, id, besvarelser):
         return _spørgeskema.besvarSpørgeskema(self, id, besvarelser)
 
-    def optagedeLokaler(self):
-        return _ledigeLokaler.optagedeLokaler(self)
+    def lokaleDagsorden(self):
+        return _ledigeLokaler.lokaleDagsorden(self)

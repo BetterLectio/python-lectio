@@ -21,7 +21,7 @@ def ledigeLokaler(self):
 
     return ledigeLokalerDict
 
-def optagedeLokaler(self):
+def lokaleDagsorden(self):
     informationer = self.informationer()
     lokaler = list(informationer["lokaler"].values())
     lokaleNavne = list(informationer["lokaler"].keys())
