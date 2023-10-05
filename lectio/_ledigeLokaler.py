@@ -22,39 +22,41 @@ def ledigeLokaler(self):
     return ledigeLokalerDict
 
 def optagedeLokaler(self):
-    lokaler = list(self.informationer()["lokaler"].values())
+    informationer = self.informationer()
+    lokaler = list(informationer["lokaler"].values())
+    lokaleNavne = list(informationer["lokaler"].keys())
 
-    requests = len(lokaler)/30
+    lokaleList = [{"navn": lokale, "id": id, "moduler": []} for lokale, id in informationer["lokaler"].items()]
+
+    requests = len(lokaler) / 30
     if requests - int(requests) == 0:
         requests = int(requests)
     else:
-        requests = int(requests+1) # +1 for at runde op
+        requests = int(requests + 1)  # +1 for at runde op
 
     urls = []
+    today = datetime.now().strftime('%Y-%m-%d')
+    tomorrow = (datetime.now() + timedelta(1)).strftime('%Y-%m-%d')
     for _ in range(requests):
-        urls.append(f"https://www.lectio.dk/lectio/681/SkemaAvanceret.aspx?type=skema&lokalesel={','.join(lokaler[0:30]).replace('RO', '')}")
+        urls.append(f"https://www.lectio.dk/lectio/681/SkemaAvanceret.aspx?type=ShowListAll&starttime={today}T00:00:00&endtime={tomorrow}T00:00:00&dagsbemaerk=0&lokalesel={','.join(lokaler[0:30]).replace('RO', '')}")
         lokaler = lokaler[30:]
 
-    lokaler = {}
+
     for url in urls:
         resp = self.session.get(url)
         if resp.url != url:
             raise Exception("lectio-cookie udløbet")
         soup = BeautifulSoup(resp.text, "html.parser")
 
-        i = 0
-        for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
-            if i != 0:
-                dag = BeautifulSoup(str(dag), "html.parser")
-                for modul in dag.find_all("a", class_="s2skemabrik"):
-                    modulDict = _utils.skemaBrikExtract(modul)
+        table = soup.find("table", {"id": "m_Content_ListRpt_ctl00_SkemaAvanceretListe_SkemaAdvListGV"})
+        for row in table.find_all("tr")[1:]:
+            info = row.find_all("td")
+            if len(info[4].text) > 0:
+                skemabrik = info[1].find("a", {"class": "s2skemabrik"})
+                modulDict = _utils.skemaBrikExtract(skemabrik)
+                _lokaler = info[4].text.split("\r\n")
+                for lokale in _lokaler:
                     if modulDict["status"] != "aflyst":
-                        _lokaler = modulDict["lokale"].split(", ")
-                        for lokale in _lokaler:
-                            try:
-                                lokaler[lokale].append(modulDict["tidspunkt"])
-                            except KeyError:
-                                lokaler[lokale] = [modulDict["tidspunkt"]]
-            i += 1
+                        lokaleList[lokaleNavne.index(lokale)]["moduler"].append(modulDict["tidspunkt"])
 
-    return lokaler
+    return lokaleList
