@@ -83,9 +83,8 @@ def spørgeskema(self, id):
         elif content[1].find("input", {"type": "checkbox"}) != None:
             for option in content[1].find_all("div", {"class": "ls-questionnaire-answer-option"}):
                 children = option.findChildren()
-                spørgeskemaDict["svar"]["id"] = children[0].get('name')
                 spørgeskemaDict["svar"]["type"] = children[0].get("type")
-                spørgeskemaDict["svar"]["muligheder"].append({"tekst": children[1].text.strip(), "id": "on"})
+                spørgeskemaDict["svar"]["muligheder"].append({"tekst": children[1].text.strip(), "id": children[0].get('name')})
 
         tekst = content[1].find_all("div", {"class": "ls-questionnaire-question-text"})
         if len(tekst) == 2: # Så er det en udvidet beskrivelse
