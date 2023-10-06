@@ -67,19 +67,25 @@ def spørgeskema(self, id):
         if content[1].find("div", {"class": "ls-questionnaire-answer-text"}) != None:
             spørgeskemaDict["svar"]["type"] = "tekstfelt"
             spørgeskemaDict["svar"]["id"] = content[1].find("textarea").get("name")
-        elif (options := content[1].find("div", {"class": "ls-questionnaire-answer-option"})) != None:
+        elif (options := content[1].find("div", {"class": "ls-questionnaire-answer-option"})) != None and content[1].find("input", {"type": "radio"}) != None:
             mulighed = {"tekst": "", "id": ""}
-            for option in options.find("span").findChildren():
+            children = options.find("span").findChildren()
+            for option in children:
                 if option.name == "label":
                     mulighed["tekst"] = option.text
                     spørgeskemaDict["svar"]["muligheder"].append(mulighed)
                     mulighed = {"tekst": "", "id": ""}
 
                 elif option.name == "input":
-                    mulighed["id"] = option.get('value')
+                    mulighed["id"] = option.get("value")
                     spørgeskemaDict["svar"]["id"] = option.get('name')
                     spørgeskemaDict["svar"]["type"] = option.get("type")
-
+        elif content[1].find("input", {"type": "checkbox"}) != None:
+            for option in content[1].find_all("div", {"class": "ls-questionnaire-answer-option"}):
+                children = option.findChildren()
+                spørgeskemaDict["svar"]["id"] = children[0].get('name')
+                spørgeskemaDict["svar"]["type"] = children[0].get("type")
+                spørgeskemaDict["svar"]["muligheder"].append({"tekst": children[1].text.strip(), "id": "on"})
 
         tekst = content[1].find_all("div", {"class": "ls-questionnaire-question-text"})
         if len(tekst) == 2: # Så er det en udvidet beskrivelse
