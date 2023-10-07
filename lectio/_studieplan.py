@@ -49,7 +49,7 @@ def forløb(self, id):
     soup = BeautifulSoup(resp.text, "html.parser")
 
     oversigt = soup.find("div", {"class": "ls-phase-activity", "id": "overview"}).find("table")
-    forløbDict = {}
+    forløbDict = {"titel": soup.find("div", {"class": "ls-paper-section-heading ls-section-title-heading"}).text}
     for row in oversigt:
         try:
             key = row.find("th").text.strip().replace(" ", "_").lower()[:-1]
