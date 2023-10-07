@@ -43,7 +43,6 @@ def studieplan(self):
 
 def forløb(self, id):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/studieplan/forloeb_vis.aspx?phaseid={id[2:]}"
-    print(url)
     resp = self.session.get(url)
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
@@ -53,7 +52,7 @@ def forløb(self, id):
     forløbDict = {}
     for row in oversigt:
         try:
-            key = row.find("th").text.strip().replace(" ", "_").lower()
+            key = row.find("th").text.strip().replace(" ", "_").lower()[:-1]
             value = row.find("td")
             if value.find("table") == None:
                 forløbDict[key] = value.text.strip().replace("\r\n\t\t\t\t\t\t\t—\r\n\t\t\t\t\t\t\t", " - ")
