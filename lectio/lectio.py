@@ -1,10 +1,5 @@
-"""
-TODO:
-  * Gør elev og lærer id til id men hvor at elev id har et S foran (Eks: S123456789) og lærer har et T foran (Eks: T12345678)
-"""
-
 from .imports import *
-from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside, _ledigeLokaler, _karakterer, _eksamener, _studieretning, _spørgeskema, _termin
+from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside, _ledigeLokaler, _karakterer, _eksamener, _studieretning, _spørgeskema, _termin, _studieplan
 
 class sdk:
     def __init__(self, brugernavn, adgangskode, skoleId, base64Cookie=None):
@@ -110,3 +105,9 @@ class sdk:
 
     def lokaleDagsorden(self, kunAktuelAfdeling=True):
         return _ledigeLokaler.lokaleDagsorden(self, kunAktuelAfdeling)
+
+    def studieplan(self):
+        return _studieplan.studieplan(self)
+
+    def forløb(self, id):
+        return _studieplan.forløb(self, id)
