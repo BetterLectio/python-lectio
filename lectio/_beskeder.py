@@ -65,7 +65,6 @@ def beskeder(self, id=None):
             header = header.lower().title().replace(" ", "")
             header = header[0].lower() + header[1:]
             beskedHeader.append(header)
-    print(beskedHeader)
 
     beskeder = []
     for beskedHtml in beskederHtml[1:]:
