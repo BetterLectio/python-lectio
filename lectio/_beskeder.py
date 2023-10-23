@@ -13,6 +13,7 @@ def beskeder(self, id=None):
     resp = self.session.get(url)
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
+
     soup = BeautifulSoup(resp.text, "html.parser")
 
     beskederHtml = soup.find_all("tr")
@@ -29,7 +30,7 @@ def beskeder(self, id=None):
         resp = self.session.post(url, data=payload)
         soup = BeautifulSoup(resp.text, "html.parser")
 
-        beskederHtml = soup.find_all("tr")[2:-2]
+        beskederHtml = soup.find_all("tr")[:-2]
 
     options = []
     for div in soup.find("div", {"id": "s_m_Content_Content_ListGridSelectionTree"}).find_all("div", {
