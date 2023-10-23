@@ -131,8 +131,13 @@ def besked(self, message_id):
             "besked": besked.find("div", {"class": "message-thread-message-content"}).text.strip(),
             "vedhæftninger": [{"navn": vedhæft.text, "href": "https://www.lectio.dk"+vedhæft.get("href")} for vedhæft in vedhæftninger],
             "besvarelse": besvarelse,
-            "id": re.search("ctl\d+", str(besked.find("div", {"class": "lec-context-menu"}))).group(),
+            "id": None,
         }
+
+        try:
+            beskedDict["id"] = re.search("ctl\d+", str(besked.find("div", {"class": "lec-context-menu"}))).group()
+        except Exception:
+            pass
 
         if besvarelse != None:
             beskedDict["padding_left"] = calculateSpacing(f"{bruger['navn']}, {beskedDict['dato']}", beskedOversigt)
@@ -147,7 +152,7 @@ def besked(self, message_id):
             sortedBeskeder.append(besked)
 
     beskedDict = {
-        "modtagere": soup.find("div", {"id": "s_m_Content_Content_MessageThreadCtrlId_RecipientsReadMode"}).text.strip(),
+        "modtagere": ", ".join([str(modtager.text) for modtager in soup.find("div", {"id": "s_m_Content_Content_MessageThreadCtrlId_RecipientsReadMode"}) if len(modtager.text.strip().replace(",", "")) > 0]).strip(),
         "beskeder": sortedBeskeder
     }
 
