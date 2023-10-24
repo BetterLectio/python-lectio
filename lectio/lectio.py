@@ -2,22 +2,28 @@ from .imports import *
 from . import _auth, _lektier, _skema, _modul, _opgaver, _beskeder, _informationer, _filer, _fravær, _dokumenter, _forside, _ledigeLokaler, _karakterer, _eksamener, _studieretning, _spørgeskema, _termin, _studieplan
 
 class sdk:
-    def __init__(self, brugernavn, adgangskode, skoleId, base64Cookie=None):
+    def __init__(self, brugernavn=None, adgangskode=None, skoleId=None, base64Cookie=None, userId=None, QrId=None):
         self.session = requests.session()
 
-        if base64Cookie == None:
+        if brugernavn != None and adgangskode != None and skoleId != None:
             self.brugernavn = brugernavn
             self.adgangskode = adgangskode
             self.skoleId = skoleId
 
             self.login()
-        else:
+        elif base64Cookie != None:
             cookie = json.loads(base64.b64decode(base64Cookie))
             for _cookie in cookie:
                 self.session.cookies.set(_cookie["name"], _cookie["value"], domain=_cookie["for"])
 
             self.skoleId = self.session.cookies["LastLoginExamno"]
             self.elevId = self.session.cookies["LastLoginElevId"]
+        elif userId != None and QrId != None and skoleId != None:
+            self.skoleId = skoleId
+
+            self.qrLogin(userId, QrId)
+        else:
+            raise Exception("Der blev ikke angivet nok parameter til at kunne logge ind.")
 
         self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
     def login(self):
@@ -25,6 +31,9 @@ class sdk:
 
     def base64Cookie(self):
         return _auth.base64Cookie(self)
+
+    def qrLogin(self, userId, QrId):
+        return _auth.qrLogin(self, userId, QrId)
 
     def lektier(self):
         return _lektier.lektier(self)

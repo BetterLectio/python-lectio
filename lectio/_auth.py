@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def login(self):
     headers = {
@@ -85,3 +86,18 @@ def base64Cookie(self):
     })
 
     return base64.b64encode(json.dumps(cookie).encode()).decode()
+
+def qrLogin(self, userId, QrId):
+    resp = self.session.get(f"https://www.lectio.dk/lectio/{self.skoleId}/LandingPageQrCode.aspx?userId={userId}&QrId={QrId}")
+    soup = BeautifulSoup(resp.text, "html.parser")
+    if "Fejl: Der opstod en fejl" in resp.text:
+        raise Exception("Den scannede QR kode er ikke valid. En QR kode er kun gyldig i 90 sekunder og kan kun bruges én gang. - Generér en ny og prøv igen eller log ind manuelt.")
+
+    successful = False
+    for meta in soup.find_all({"meta": {"name": "msapplication-starturl"}}):
+        if f"/lectio/{self.skoleId}/forside.aspx?" in str(meta.get("content")):
+            self.elevId = meta.get("content").split("?elevid=")[1]
+            successful = True
+            break
+    if not successful:
+        raise Exception("Kunne ikke finde elev id. Rapporter venligst dette på Github")
