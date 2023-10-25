@@ -104,16 +104,20 @@ def besked(self, message_id):
     soup = BeautifulSoup(resp.text, "html.parser")
 
     beskeder = []
-    beskederHtml = soup.find("table", {"id": "s_m_Content_Content_MessageThreadCtrlId_MessagesGV"}).find_all("tr")
+    beskederHtml = soup.find("table", {"id": "s_m_Content_Content_MessageThreadCtrl_MessagesGV"}).find_all("tr")
+    if soup.find("span", {"class": "grayed-out"}).text != "Denne tråd kan ikke besvares":
+        beskederHtml = beskederHtml[:-1]
 
     beskedOversigt = {}
-    for besked in soup.find("table", {"id": "s_m_Content_Content_MessageThreadCtrlId_MessagesGV"}).find_all("tr")[:-1]:
+    for besked in beskederHtml:
         try:
-            beskedOversigt[besked.find("div", {"class": "message-thread-message-sender"}).text.strip()] = besked.find("div", {"class": "message-reply-summary viewed-persons-message"}).text.replace("Er svar på besked af ", "").strip()
+            beskedOversigt[besked.find("div", {"class": "message-thread-message-sender"}).text.strip()] = besked.find(
+                "div", {"class": "message-reply-summary viewed-persons-message"}).text.replace("Er svar på besked af ",
+                                                                                               "").strip()
         except Exception:
             beskedOversigt[besked.find("div", {"class": "message-thread-message-sender"}).text.strip()] = None
 
-    for besked in beskederHtml[:-1]:
+    for besked in beskederHtml:
         bruger = {"navn": besked.find("div", {"class": "message-thread-message-sender"}).find("span").text, "id": besked.find("div", {"class": "message-thread-message-sender"}).find("span").get("data-lectiocontextcard")}
         try:
             besvarelse = besked.find("div", {"class": "message-reply-summary viewed-persons-message"}).text.replace("Er svar på besked af ", "").strip()
@@ -153,7 +157,7 @@ def besked(self, message_id):
             sortedBeskeder.append(besked)
 
     beskedDict = {
-        "modtagere": ", ".join([str(modtager.text) for modtager in soup.find("div", {"id": "s_m_Content_Content_MessageThreadCtrlId_RecipientsReadMode"}) if len(modtager.text.strip().replace(",", "")) > 0]).strip(),
+        "modtagere": ", ".join([str(modtager.text) for modtager in soup.find("div", {"id": "s_m_Content_Content_MessageThreadCtrl_RecipientsReadMode"}) if len(modtager.text.strip().replace(",", "")) > 0]).strip(),
         "beskeder": sortedBeskeder
     }
 
