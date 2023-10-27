@@ -79,13 +79,18 @@ def forside(self):
         pass
 
     lastDate = ""
+    dato = soup.find("span", {"id": "s_m_masterfooternowSpan"}).text.split("  ")[0].replace("-", "/").split("/")
     for element in soup.find("div", {"id": "s_m_Content_Content_skemaIsland_pa"}).find_all():
         try:
             if "s2dayHeaderSimple" in element.get("class"):
                 if "I dag" in element.text:
                     lastDate = datetime.now().strftime("%d/%m-%Y")
                 else:
-                    lastDate = element.text.split(" ")[1].strip() + "-" + datetime.now().strftime("%Y")
+                    _dato = element.text.split(" ")[1].strip()
+                    if _dato.split("/")[1] == "1" and dato[1] != "1":
+                        lastDate = f'{element.text.split(" ")[1].strip()} - {int(dato[2])+1}'
+                    else:
+                        lastDate = f'{element.text.split(" ")[1].strip()} - {dato[2]}'
         except Exception:
             if element.get("role") == "heading":
                 forsideDict["skema"].append(_utils.skemaBrikExtract(lastDate, element.find("a", {"class": "s2skemabrik"})))

@@ -67,12 +67,14 @@ def lokaleDagsorden(self, kunAktuelAfdeling=True):
             raise Exception("lectio-cookie udløbet")
         soup = BeautifulSoup(resp.text, "html.parser")
 
+        årstal = re.search("\d+/\d+-\d+", soup.find("div", {"class": "ls-std-rowblock"}).text).group().split("-")[1]
+
         table = soup.find("table", {"id": "m_Content_ListRpt_ctl00_SkemaAvanceretListe_SkemaAdvListGV"})
         for row in table.find_all("tr")[1:]:
             info = row.find_all("td")
             if len(info[4].text) > 0:
                 skemabrik = info[1].find("a", {"class": "s2skemabrik"})
-                modulDict = _utils.skemaBrikExtract(info[1].text.split(" ")[1] + "-" + datetime.now().strftime("%Y"), skemabrik)
+                modulDict = _utils.skemaBrikExtract(info[1].text.split(" ")[1] + "-" + årstal, skemabrik)
                 _lokaler = info[4].text.split("\r\n")
                 for lokale in _lokaler:
                     if modulDict["status"] != "aflyst":

@@ -11,11 +11,18 @@ def lektier(self):
 
     lektier = []
 
+    _dato = soup.find("span", {"id": "s_m_masterfooternowSpan"}).text.split("  ")[0].replace("-", "/").split("/")
     for tr in soup.find_all("tr"):
         modul = tr.find("a", class_="s2skemabrik")
         if modul is None:
             continue
-        dato = tr.find("th").find("b").text.split(" ")[1] + "-" + datetime.now().strftime("%Y")
+
+        dato = tr.find("th").find("b").text.split(" ")[1]
+        if dato.split("/")[1] == "1" and _dato[1] != "1":
+            dato += f'-{int(_dato[2])+1}'
+        else:
+            dato += f'-{int(_dato[2])}'
+
         modulDict = _utils.skemaBrikExtract(dato, modul)
         try:
             lektie = {

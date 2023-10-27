@@ -67,6 +67,8 @@ def skema(self, uge=None, år=None, id=None):
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
+    årstal = soup.find("input", {"name": "s$m$Content$Content$SkemaNyMedNavigation$datePicker$tb"}).get("value").split(" ")[-1]
+
     skema["overskrift"] = soup.find("div", {"id": "s_m_HeaderContent_MainTitle"}).text
 
     if id == None or id[0] == "S" or id[0] == "C":
@@ -104,7 +106,7 @@ def skema(self, uge=None, år=None, id=None):
         if i != 0:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
-                modulDict = _utils.skemaBrikExtract(soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + datetime.now().strftime("%Y"), modul)
+                modulDict = _utils.skemaBrikExtract(soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + årstal, modul)
                 skema["moduler"].append(modulDict)
         i += 1
 
