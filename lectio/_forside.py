@@ -78,8 +78,17 @@ def forside(self):
     except Exception:
         pass
 
-    for modul in soup.find("div", {"id": "s_m_Content_Content_skemaIsland_pa"}).find_all("a", {"class": "s2skemabrik"}):
-        forsideDict["skema"].append(_utils.skemaBrikExtract(modul))
+    lastDate = ""
+    for element in soup.find("div", {"id": "s_m_Content_Content_skemaIsland_pa"}).find_all():
+        try:
+            if "s2dayHeaderSimple" in element.get("class"):
+                if "I dag" in element.text:
+                    lastDate = datetime.now().strftime("%d/%m-%Y")
+                else:
+                    lastDate = element.text.split(" ")[1].strip() + "-" + datetime.now().strftime("%Y")
+        except Exception:
+            if element.get("role") == "heading":
+                forsideDict["skema"].append(_utils.skemaBrikExtract(lastDate, element.find("a", {"class": "s2skemabrik"})))
 
     try:  
         eksamener_table = soup.find("table", {"id": "s_m_Content_Content_EksamenerInfo"})

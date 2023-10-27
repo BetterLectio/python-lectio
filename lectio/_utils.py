@@ -28,7 +28,7 @@ renameDictionary = {
     "Lokaler": "Lokale"
 }
 
-def skemaBrikExtract(skemabrik):
+def skemaBrikExtract(dato, skemabrik):
     try:
         absid = re.search('absid=[0-9]+', skemabrik["href"]).group().replace("absid=", "")
     except Exception:
@@ -63,11 +63,10 @@ def skemaBrikExtract(skemabrik):
             modulDict[navn.lower()] = value
         else:
             try:
-                int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0],
-                                      "%d/%m-%Y %H:%M").timestamp())
-                modulDict["tidspunkt"] = modulDetalje
+                int(datetime.strptime(modulDetalje.split(" - ")[0], "%H:%M").timestamp())
+                modulDict["tidspunkt"] = f"{dato} {modulDetalje.replace(' - ', ' til ')}"
             except Exception:
-                modulDict["navn"] = modulDetalje.split(": ")[0]
+                modulDict["navn"] = modulDetalje
 
     try:
         modulDict["hold_id"] = re.search('data-lectiocontextcard="HE[0-9]+', str(skemabrik)).group().replace("data-lectiocontextcard=\"", "")

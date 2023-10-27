@@ -72,7 +72,7 @@ def lokaleDagsorden(self, kunAktuelAfdeling=True):
             info = row.find_all("td")
             if len(info[4].text) > 0:
                 skemabrik = info[1].find("a", {"class": "s2skemabrik"})
-                modulDict = _utils.skemaBrikExtract(skemabrik)
+                modulDict = _utils.skemaBrikExtract(info[1].text.split(" ")[1] + "-" + datetime.now().strftime("%Y"), skemabrik)
                 _lokaler = info[4].text.split("\r\n")
                 for lokale in _lokaler:
                     if modulDict["status"] != "aflyst":

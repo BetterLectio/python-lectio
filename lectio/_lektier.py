@@ -15,10 +15,11 @@ def lektier(self):
         modul = tr.find("a", class_="s2skemabrik")
         if modul is None:
             continue
-        modulDict = _utils.skemaBrikExtract(modul)
+        dato = tr.find("th").find("b").text.split(" ")[1] + "-" + datetime.now().strftime("%Y")
+        modulDict = _utils.skemaBrikExtract(dato, modul)
         try:
             lektie = {
-                "dato": tr.find("th").get("b"),
+                "dato": dato,
                 "aktivitet": modulDict,
                 "note": tr.find_all("td")[1].text,
             }

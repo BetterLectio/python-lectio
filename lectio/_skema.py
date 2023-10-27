@@ -82,11 +82,8 @@ def skema(self, uge=None, år=None, id=None):
     elif id[0] == "T":
         skema["hold"] = self.fåBruger(brugerId=id)["hold"]
 
-
     for modulTid in soup.find_all("div", {"class": "s2module-info"}):
         skema["modulTider"][modulTid.prettify().split("\n")[2].lstrip()] = modulTid.prettify().split("\n")[4].lstrip()
-
-
 
     for dag in soup.find("tr", {"class": "s2dayHeader"}).find_all("td"):
         if dag.text != "":
@@ -107,7 +104,7 @@ def skema(self, uge=None, år=None, id=None):
         if i != 0:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
-                modulDict = _utils.skemaBrikExtract(modul)
+                modulDict = _utils.skemaBrikExtract(soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + datetime.now().strftime("%Y"), modul)
                 skema["moduler"].append(modulDict)
         i += 1
 
