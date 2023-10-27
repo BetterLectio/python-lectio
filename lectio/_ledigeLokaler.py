@@ -2,7 +2,7 @@ from .imports import *
 from . import _utils
 
 def ledigeLokaler(self):
-    url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaAvanceret.aspx?type=aktuelleallelokaler&nosubnav=1&prevurl=FindSkemaAdv.aspx"
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaAvanceret.aspx?type=aktuellelokaler&nosubnav=1&prevurl=FindSkemaAdv.aspx"
     resp = self.session.get(url)
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
@@ -29,7 +29,7 @@ def lokaleDagsorden(self, kunAktuelAfdeling=True):
     afdelingsLokaler = []
     afdelingsLokalerNavne = []
     if kunAktuelAfdeling:
-        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaAvanceret.aspx?type=aktuelleallelokaler&nosubnav=1&prevurl=FindSkemaAdv.aspx"
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaAvanceret.aspx?type=aktuellelokaler&nosubnav=1&prevurl=FindSkemaAdv.aspx"
         resp = self.session.get(url)
         if resp.url != url:
             raise Exception("lectio-cookie udløbet")
