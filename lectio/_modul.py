@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 def modul(self, absid):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}"
@@ -39,34 +40,9 @@ def modul(self, absid):
                     else:
                         modulDetaljer[last] += unicodedata.normalize("NFKD", elementSoup.text.rstrip().lstrip().replace(u"\xa0", u" ") + "\n")
 
-    renameDictionary = {
-        "Lærere": "Lærer",
-        "Lokaler": "Lokale"
-    }
-
-    modulDict = {
-        "navn": None,
-        "tidspunkt": None,
-        "hold": None,
-        "lærer": None,
-        "lokale": None,
-        "absid": absid
-    }
-    for modulDetalje in soup.find("a", class_="s2skemabrik")["data-additionalinfo"].split("\n\n")[0].split("\n"):
-        if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
-            if (navn := modulDetalje.split(": ")[0]) in renameDictionary:
-                navn = renameDictionary[navn]
-
-            modulDict[navn.lower()] = value
-        else:
-            try:
-                int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0],
-                                      "%d/%m-%Y %H:%M").timestamp())
-                modulDict["tidspunkt"] = modulDetalje
-            except Exception:
-                modulDict["navn"] = modulDetalje.split(": ")[0]
-
-    modulDetaljer["aktivitet"] = modulDict
+    årstal = soup.find("span", {"id": "s_m_masterfooternowSpan"}).text.split("  ")[0].split("-")[1] # Upræcis men virker det meste af tiden
+    dato = soup.find("div", {"class": "s2skemabrikcontent"}).text.split(" ")[1] + "-" + årstal
+    modulDetaljer["aktivitet"] = _utils.skemaBrikExtract(dato, soup.find("a", class_="s2skemabrik"))
 
     return modulDetaljer
 
