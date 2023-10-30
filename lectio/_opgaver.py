@@ -108,6 +108,7 @@ def opgaver(self):
 
         if opgaveDict["afventer"] == "":
             opgaveDict["status"] = "Afsluttet"
+        opgaveDict["status"] = opgaveDict["status"].split("\r\n\t\t\t\t\t\t\t")[0].strip()
         opgaver.append(opgaveDict)
 
     return opgaver
