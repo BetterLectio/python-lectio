@@ -3,15 +3,12 @@ from . import _utils
 
 def beskeder(self, id=None):
     if id != None:
-        if "-" in str(id):
-            url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=&elevid={self.elevId}&selectedfolderid={id}"
-        else:
-            url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=selecthold&elevid={self.elevId}&holdid={id}"
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?mappeid={id}"
     else:
-        url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=liste&elevid={self.elevId}"
+        url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx"
 
     resp = self.session.get(url)
-    if resp.url != url:
+    if url not in resp.url:
         raise Exception("lectio-cookie udløbet")
 
     soup = BeautifulSoup(resp.text, "html.parser")
