@@ -94,7 +94,7 @@ def calculateSpacing(besked, beskedOversigt, spacing=0):
         return spacing
 
 def besked(self, message_id):
-    url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&elevid={self.elevId}&id={message_id}"
+    url = f"https://www.lectio.dk/lectio/681/beskeder2.aspx?type=visbesked&id={message_id}"
     resp = self.session.get(url)
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
