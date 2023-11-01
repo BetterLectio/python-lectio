@@ -1,4 +1,5 @@
 from .imports import *
+from . import _utils
 
 renameDictionary = {
     "Lærere": "Lærer",
@@ -38,73 +39,28 @@ def fravær(self):
     if "Der er ingen manglende fraværsårsager..." not in str(manglende):
         for tr in manglende.find_all("tr")[1:]:
             modul = tr.find("a", class_="s2skemabrik")
-            modulDetaljer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
-
-            modulDict = {
-                "navn": None,
-                "tidspunkt": None,
-                "hold": None,
-                "lærer": None,
-                "lokale": None,
-                "absid": re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", "")
-            }
-            for modulDetalje in modulDetaljer:
-                if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
-                    if (navn := modulDetalje.split(": ")[0]) in renameDictionary:
-                        navn = renameDictionary[navn]
-
-                    modulDict[navn.lower()] = value
-                else:
-                    try:
-                        int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0],
-                                              "%d/%m-%Y %H:%M").timestamp())
-                        modulDict["tidspunkt"] = modulDetalje
-                    except Exception:
-                        modulDict["navn"] = modulDetalje.split(": ")[0]
-
             tds = tr.find_all("td")
+            registreretLærer = tds[4].text.lstrip().split("\n\t\t\t\t\t\t")
+            årsagÅrsagsnote = tds[6].text.lstrip().split("\n\t\t\t\t\t\t")
+            if len(årsagÅrsagsnote) == 1:
+                årsagÅrsagsnote.append("")
 
             fravær["moduler"]["manglende_fraværsårsager"].append({
-                "type": tds[0].text.lstrip(),
-                "uge": tds[1].text.lstrip(),
-                "aktivitet": modulDict,
-                "fravær": tds[3].text.lstrip(),
-                "fraværstype": tds[4].text.lstrip(),
-                "registreret": tds[5].text.lstrip(),
-                "lærer": tds[6].text.lstrip(),
-                "bemærkning": None
+                "type": "Lektion", # De har fjernet det fra tabellen, måske skal vi også gøre det samme.
+                "uge": tds[0].text.lstrip(),
+                "aktivitet": _utils.skemaBrikExtract(registreretLærer[0].rstrip().split(" ")[0], modul),
+                "fravær": tds[2].text.lstrip(),
+                "fraværstype": tds[3].text.lstrip(),
+                "registreret": registreretLærer[0].rstrip(),
+                "lærer": registreretLærer[1],
+                "bemærkning": tds[5].text.lstrip(),
             })
 
     oversigt = soup.find("table", {"id": "s_m_Content_Content_FatabAbsenceFravaerGV"})
     if "Der er ikke indtastet nogen fraværsårsager" not in str(oversigt):
         for tr in oversigt.find_all("tr")[1:]:
             modul = tr.find("a", class_="s2skemabrik")
-            modulDetaljer = modul["data-additionalinfo"].split("\n\n")[0].split("\n")
-
-            modulDict = {
-                "navn": None,
-                "tidspunkt": None,
-                "hold": None,
-                "lærer": None,
-                "lokale": None,
-                "absid": re.search('absid=[0-9]+', modul["href"]).group().replace("absid=", "")
-            }
-            for modulDetalje in modulDetaljer:
-                if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
-                    if (navn := modulDetalje.split(": ")[0]) in renameDictionary:
-                        navn = renameDictionary[navn]
-
-                    modulDict[navn.lower()] = value
-                else:
-                    try:
-                        int(datetime.strptime(modulDetalje.split(": ")[0].split(" til")[0],
-                                              "%d/%m-%Y %H:%M").timestamp())
-                        modulDict["tidspunkt"] = modulDetalje
-                    except Exception:
-                        modulDict["navn"] = modulDetalje.split(": ")[0]
-
             tds = tr.find_all("td")
-
             registreretLærer = tds[4].text.lstrip().split("\n\t\t\t\t\t\t")
             årsagÅrsagsnote = tds[6].text.lstrip().split("\n\t\t\t\t\t\t")
             if len(årsagÅrsagsnote) == 1:
@@ -113,7 +69,7 @@ def fravær(self):
             fravær["moduler"]["oversigt"].append({
                 "type": "Lektion", # De har fjernet det fra tabellen, måske skal vi også gøre det samme.
                 "uge": tds[0].text.lstrip(),
-                "aktivitet": modulDict,
+                "aktivitet": _utils.skemaBrikExtract(registreretLærer[0].rstrip().split(" ")[0], modul),
                 "fravær": tds[2].text.lstrip(),
                 "fraværstype": tds[3].text.lstrip(),
                 "registreret": registreretLærer[0].rstrip(),
