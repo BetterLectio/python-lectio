@@ -85,13 +85,15 @@ def forside(self):
             if "s2dayHeaderSimple" in element.get("class"):
                 if "I dag" in element.text:
                     lastDate = datetime.now().strftime("%d/%m-%Y")
+                elif "I morgen" in element.text:
+                    lastDate = (datetime.now() + timedelta(days=1)).strftime("%d/%m-%Y")
                 else:
                     _dato = element.text.split(" ")[1].strip()
                     if _dato.split("/")[1] == "1" and dato[1] != "1":
                         lastDate = f'{element.text.split(" ")[1].strip()} - {int(dato[2])+1}'
                     else:
                         lastDate = f'{element.text.split(" ")[1].strip()} - {dato[2]}'
-        except Exception:
+        except TypeError:
             if element.get("role") == "heading":
                 forsideDict["skema"].append(_utils.skemaBrikExtract(lastDate, element.find("a", {"class": "s2skemabrik"})))
 
