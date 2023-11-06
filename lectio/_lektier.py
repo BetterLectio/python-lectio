@@ -17,29 +17,18 @@ def lektier(self):
         if modul is None:
             continue
 
-        dato = tr.find("th").find("b").text.split(" ")[1]
-        if dato.split("/")[1] == "1" and _dato[1] != "1":
-            dato += f'-{int(_dato[2])+1}'
-        else:
-            dato += f'-{int(_dato[2])}'
-
-        modulDict = _utils.skemaBrikExtract(dato, modul)
+        modulDict = _utils.skemaBrikExtract("", modul)
         try:
             lektie = {
-                "dato": dato,
+                "dato": modulDict["tidspunkt"],
                 "aktivitet": modulDict,
                 "note": tr.find_all("td")[1].text,
             }
-            if tr.find("td", {"class": "ls-homework"}).find("a"):
-                lektie["lektier"] = {
-                    "beskrivelse": tr.find("td", {"class": "ls-homework"}).find("a").text,
-                    "link": tr.find("td", {"class": "ls-homework"}).find("a").get("href")
-                }
-            else:
-                lektie["lektier"] = {
-                    "beskrivelse": tr.find("td", {"class": "ls-homework"}).text,
-                    "link": f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={modulDict['absid']}&elevid={self.elevId}" # næsten det samme alligevel
-                }
+            tds = tr.find_all("td")
+            lektie["lektier"] = {
+                "beskrivelse": tds[2].text,
+                "link": tds[2].find("a").get("href")
+            }
         except:
             lektie = {
                 "dato": tr.find("th").get("b"),

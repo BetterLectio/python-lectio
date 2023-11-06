@@ -63,8 +63,8 @@ def skemaBrikExtract(dato, skemabrik):
             modulDict[navn.lower()] = value
         else:
             try:
-                int(datetime.strptime(modulDetalje.split(" - ")[0], "%H:%M").timestamp())
-                modulDict["tidspunkt"] = f"{dato} {modulDetalje.replace(' - ', ' til ')}"
+                int(datetime.strptime(modulDetalje.split(" til ")[1], "%H:%M").timestamp())
+                modulDict["tidspunkt"] = f"{modulDetalje.replace(' - ', ' til ')}"
             except Exception:
                 modulDict["navn"] = modulDetalje
 
