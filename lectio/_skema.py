@@ -11,13 +11,13 @@ def skema(self, uge=None, år=None, id=None):
     }
 
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/SkemaNy.aspx?"
-    if id[0] == "U":
+
+    if id != None and id[0] == "U":
         bruger = self.fåBruger(brugerId=id)
         if bruger["type"] == "elev":
             id = "S" + bruger["id"]
         elif bruger["type"] == "lærer":
             id = "T" + bruger["id"]
-
     if id == None:
         url += f"type=elev&elevid={self.elevId}"
         skema["hold"] = []
@@ -61,12 +61,10 @@ def skema(self, uge=None, år=None, id=None):
         raise Exception("Enten skal hverken uge og år være i brug ellers skal både uge og år være i brug")
 
     resp = self.session.get(url)
-
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
 
     soup = BeautifulSoup(resp.text, "html.parser")
-
     årstal = soup.find("input", {"name": "s$m$Content$Content$SkemaNyMedNavigation$datePicker$tb"}).get("value").split(" ")[-1]
 
     skema["overskrift"] = soup.find("div", {"id": "s_m_HeaderContent_MainTitle"}).text

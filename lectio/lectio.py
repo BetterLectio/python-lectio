@@ -25,7 +25,10 @@ class sdk:
         else:
             raise Exception("Der blev ikke angivet nok parameter til at kunne logge ind.")
 
-        self.session.headers.update({"content-type": "application/x-www-form-urlencoded"})
+        self.session.headers.update({
+            "content-type": "application/x-www-form-urlencoded",
+            "referer": f"https://www.lectio.dk/lectio/{self.skoleId}/forside.aspx",
+        })
     def login(self):
         return _auth.login(self)
 
