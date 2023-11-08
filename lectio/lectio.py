@@ -25,6 +25,8 @@ class sdk:
         else:
             raise Exception("Der blev ikke angivet nok parameter til at kunne logge ind.")
 
+
+        self.session.cookies.set("isloggedin3", "Y", domain="www.lectio.dk")
         self.session.headers.update({
             "content-type": "application/x-www-form-urlencoded",
             "referer": f"https://www.lectio.dk/lectio/{self.skoleId}/forside.aspx",
