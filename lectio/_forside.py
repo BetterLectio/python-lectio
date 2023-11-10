@@ -33,7 +33,7 @@ def forside(self):
                 contentStr = contentStr.replace(str(span), str(new))
 
             forsideDict["aktuelt"].append({
-                "punkt_farve": colorDict[tr.find("td", {"class": "iconCol"}).find("img").get("src").split("/")[-1]],
+                "punkt_farve": "grå", # Hvis lectio tilføjer det igen: colorDict[tr.find("td", {"class": "iconCol"}).find("img").get("src").split("/")[-1]],
                 "text": markdownify.markdownify(contentStr, heading_style="ATX").lstrip().rstrip().replace("\n\n", "\n"), #HTML til markdown det
             })
     except Exception:
