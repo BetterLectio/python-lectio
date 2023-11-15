@@ -145,7 +145,7 @@ def besked(self, message_id):
             beskedDict["padding_left"] = calculateSpacing(f"{bruger['navn']}, {beskedDict['dato']}", beskedOversigt)
 
         beskeder.append(beskedDict)
-
+    beskeder[0]["id"] = None
     sortedBeskeder = []
     for besked in beskeder:
         if besked["besvarelse"]:
@@ -163,37 +163,36 @@ def besked(self, message_id):
 def besvarBesked(self, message_id, id, titel, content, _from):
     content = content  + "\n\n" + ["Sendt fra [url=github.com/BetterLectio/python-lectio] python-lectio [/url]", "Sendt fra [url=betterlectio.dk] BetterLectio [/url]"][_from]
 
-    url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&elevid={self.elevId}&id={message_id}"
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=visbesked&id={message_id}"
     resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    payload = _utils.generatePayload(soup, "__Page")
-    payload["__EVENTARGUMENT"] = id
-    payload["__LASTFOCUS"] = ""
-    payload["s$m$searchinputfield"] = ""
-    payload["s$m$Content$Content$SPSearchText$tb"] = ""
-    payload["LectioPostbackId"] = ""
+    if id != None:
+        payload = _utils.generatePayload(soup, f"s$m$Content$Content$MessageThreadCtrl$MessagesGV${id}$ReplyToMessage")
+        payload["__EVENTARGUMENT"] = ""
+        payload["__LASTFOCUS"] = ""
+        payload["s$m$Content$Content$MessageThreadCtrl$MessagesGV$ctl12$EditModeHeaderTitleTB$tb"] = titel
+        payload["s$m$Content$Content$MessageThreadCtrl$MessagesGV$ctl12$EditModeContentBBTB$TbxNAME$tb"] = content
+        payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
+        resp = self.session.post(url, data=payloadEncoded)
+        soup = BeautifulSoup(resp.text, "html.parser")
 
-    payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
-    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={self.elevId}", data=payloadEncoded)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    sendMessageId = re.search("ctl\d+", str(soup.find("a", {"title": "Genvej: Alt+S / Shift+Alt+S / Ctrl+Alt+S"}))).group()
 
-    payload = _utils.generatePayload(soup, "s$m$Content$Content$CreateAnswerOKBtn")
-    payload["__LASTFOCUS"] = ""
+    payload = _utils.generatePayload(soup, f"s$m$Content$Content$MessageThreadCtrl$MessagesGV${sendMessageId}$SendMessageBtn")
     payload["__EVENTARGUMENT"] = ""
-    payload["s$m$searchinputfield"] = ""
-    payload["s$m$Content$Content$addRecipientToAnswerDD$inp"] = "" # Skal tilføjes som option
-    payload["s$m$Content$Content$Notification"] = "NotifyBtnAuthor" # Skal tilføjes som option
-    payload["s$m$Content$Content$RepliesToResponseAllowed"] = "on" # Skal tilføjes som option
-    payload["s$m$Content$Content$CreateAnswerHeading$tb"] = titel
-    payload["s$m$Content$Content$CreateAnswerContent$TbxNAME$tb"] = content
-    payload["LectioPostbackId"] = ""
-
+    payload["__LASTFOCUS"] = ""
+    payload["__SCROLLPOSITIONX"] = "0"
+    payload["__SCROLLPOSITIONY"] = "0"
+    payload["__SCROLLPOSITIONY"] = "0"
+    payload[f"s$m$Content$Content$MessageThreadCtrl$MessagesGV${sendMessageId}$EditModeHeaderTitleTB$tb"] = titel
+    payload[f"s$m$Content$Content$MessageThreadCtrl$MessagesGV${sendMessageId}$EditModeContentBBTB$TbxNAME$tb"] = content
     payloadEncoded = "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())
-
-    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/beskeder2.aspx?type=showthread&id={message_id}&elevid={message_id}", data=payloadEncoded, allow_redirects=False)
-
-    if resp.status_code == 303:
+    
+    resp = self.session.post(url, data=payloadEncoded)
+    if resp.status_code == 200:
         return {"success": True}
     else:
         raise Exception("Levering af besvarelsen var ikke succesfuld")
