@@ -1,6 +1,38 @@
 from .imports import *
 from . import _utils
 
+def modulHtml(self, absid):
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+
+    modulDetaljer = {
+        "aktivitet": None,
+        "note": "",
+        "lektier": "",
+        "præsentation": "",
+        "øvrigt_indhold": ""
+    }
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    modulDetaljer["aktivitet"] = _utils.skemaBrikExtract("", soup.find("a", class_="s2skemabrik"))
+
+    try:
+        modulDetaljer["note"] = soup.find("textarea", {"class": "activity-note"}).prettify()
+    except AttributeError:
+        pass
+
+    last = ""
+    for indhold in soup.find("div", {"id": "s_m_Content_Content_tocAndToolbar_inlineHomeworkDiv"}).findChildren(recursive=False):
+        if indhold.get("id"):
+            modulDetaljer[last] = indhold.prettify()
+        else:
+            last = indhold.text.strip().lower().replace(" ", "_")
+
+    return modulDetaljer
+
 def modul(self, absid):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/aktivitet/aktivitetforside2.aspx?absid={absid}"
     resp = self.session.get(url)

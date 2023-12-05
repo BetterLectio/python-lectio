@@ -13,15 +13,13 @@ def generatePayload(soup, eventTarget):
 
     return payload
 
-
-
-statusDictionary = {
-    "s2brik": "normal",
-    "s2cancelled": "aflyst",
-    "s2changed": "ændret",
-
-    "s2bgboxeksamen": "eksamen"
-}
+#statusDictionary = {
+#    "s2normal": "normal",
+#    "s2cancelled": "aflyst",
+#    "s2changed": "ændret",
+#
+#    "s2bgboxeksamen": "eksamen"
+#}
 
 renameDictionary = {
     "Lærere": "Lærer",
@@ -47,11 +45,15 @@ def skemaBrikExtract(dato, skemabrik):
     }
 
     modulDetaljer = skemabrik
-    statusClass = modulDetaljer.get("class")[2]
-    if statusClass in statusDictionary:
-        modulDict["status"] = statusDictionary[modulDetaljer.get("class")[2]]
-    else:
-        modulDict["status"] = modulDetaljer.get("class")[2]
+    modulClass = modulDetaljer.get("class")
+    if "s2normal" in modulClass:
+        modulDetaljer["status"] = "normal"
+    elif "s2cancelled" in modulClass:
+        modulDetaljer["status"] = "aflyst"
+    elif "s2changed" in modulClass:
+        modulDetaljer["status"] = "ændret"
+    elif "s2bgboxeksamen" in modulClass:
+        modulDetaljer["status"] = "eksamen"
 
     modulDetaljer = modulDetaljer["data-additionalinfo"].split("\n\n")[0].split("\n")
 

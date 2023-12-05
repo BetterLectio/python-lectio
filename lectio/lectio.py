@@ -49,6 +49,9 @@ class sdk:
     def modul(self, absid):
         return _modul.modul(self, absid)
 
+    def modulHtml(self, absid):
+        return _modul.modulHtml(self, absid)
+
     def opgave(self, exerciseid):
         return _opgaver.opgave(self, exerciseid)
     def opgaver(self):
