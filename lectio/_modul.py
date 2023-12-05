@@ -25,11 +25,12 @@ def modulHtml(self, absid):
         pass
 
     last = ""
-    for indhold in soup.find("div", {"id": "s_m_Content_Content_tocAndToolbar_inlineHomeworkDiv"}).findChildren(recursive=False):
+    for indhold in soup.find("div", {"id": "s_m_Content_Content_tocAndToolbar_inlineHomeworkDiv"}).find_all("div", recursive=False):
         if indhold.get("id"):
-            modulDetaljer[last] = indhold.prettify()
+            modulDetaljer[last] += indhold.prettify()
         else:
             last = indhold.text.strip().lower().replace(" ", "_")
+            modulDetaljer[last] = ""
 
     return modulDetaljer
 
