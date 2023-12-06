@@ -1,3 +1,5 @@
+import decimal
+
 from .imports import *
 from . import _utils
 
@@ -100,11 +102,21 @@ def skema(self, uge=None, år=None, id=None):
 
     i = 0
 
+    modulTider = {}
     for dag in soup.find_all("div", class_="s2skemabrikcontainer"):
-        if i != 0:
+        if i == 0:
+            modulTidsBlokke = dag.find_all("div", {"class": "s2module-bg"})
+            _modulTider = dag.find_all("div", {"class": "s2module-info"})
+            for j in range(len(modulTidsBlokke)):
+                top = (Decimal(re.search("top:[^;]+", modulTidsBlokke[j].get("style")).group()[4:-2])).quantize(Decimal("0.01"), decimal.ROUND_HALF_UP)
+                modulTider[str(top)] = re.search("\d+:\d+ - \d+:\d+", _modulTider[j].text).group()
+        else:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
-                modulDict = _utils.skemaBrikExtract(soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + årstal, modul)
+                modulDict = _utils.skemaBrikExtract("", modul)
+                if not modulDict["tidspunkt"]:
+                    top = re.search("top:[^;]+", modul.get("style")).group()[4:-2]
+                    modulDict["tidspunkt"] = soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + årstal + " " + modulTider[top]
                 skema["moduler"].append(modulDict)
         i += 1
 
