@@ -109,7 +109,7 @@ def skema(self, uge=None, år=None, id=None):
             _modulTider = dag.find_all("div", {"class": "s2module-info"})
             for j in range(len(modulTidsBlokke)):
                 top = (Decimal(re.search("top:[^;]+", modulTidsBlokke[j].get("style")).group()[4:-2])).quantize(Decimal("0.01"), decimal.ROUND_HALF_UP)
-                modulTider[str(top)] = re.search("\d+:\d+ - \d+:\d+", _modulTider[j].text).group()
+                modulTider[str(top)] = re.search("\d+:\d+ - \d+:\d+", _modulTider[j].text).group().replace("-", "til")
         else:
             dag = BeautifulSoup(str(dag), "html.parser")
             for modul in dag.find_all("a", class_="s2skemabrik"):
