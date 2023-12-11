@@ -55,7 +55,7 @@ def skemaBrikExtract(dato, skemabrik):
     elif "s2bgboxeksamen" in modulClass:
         modulDetaljer["status"] = "eksamen"
 
-    modulDetaljer = modulDetaljer["data-additionalinfo"].split("\n\n")[0].split("\n")
+    modulDetaljer = modulDetaljer["data-tooltip"].split("\n\n")[0].split("\n")
 
     for modulDetalje in modulDetaljer:
         if (value := ": ".join(modulDetalje.split(": ")[1:])) != "":
@@ -76,7 +76,7 @@ def skemaBrikExtract(dato, skemabrik):
         pass
 
     try:
-        modulDict["andet"] = skemabrik["data-additionalinfo"].split("\n\n")[1]
+        modulDict["andet"] = skemabrik["data-tooltip"].split("\n\n")[1]
     except Exception:
         pass
 
