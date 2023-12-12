@@ -23,7 +23,7 @@ def studieplan(self):
         for fagIndhold in alleFagsIndhold[colStart:colEnd]:
             for forløb in fagIndhold.find_all("div", {"class": "phase"}):
                 forløbBoks = forløb.find("a")
-                forløbBoksInfo = forløbBoks.get("data-additionalinfo")
+                forløbBoksInfo = forløbBoks.get("data-tooltip")
                 forløbDict = {
                     "titel": forløbBoks.text,
                     "estimat": re.search("Estimat: [^\n]+", forløbBoksInfo).group().replace("Estimat: ", ""),
