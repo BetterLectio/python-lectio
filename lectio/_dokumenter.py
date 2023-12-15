@@ -1,30 +1,6 @@
 from .imports import *
 from . import _utils
 
-def opretMappe(self, folderName, folderComment, folderId):
-    url = f"https://www.lectio.dk/lectio/681/DokumentFolderRediger.aspx?parentfolderid={folderId}"
-    resp = self.session.get(url)
-    if resp.url != url:
-        raise Exception("lectio-cookie udløbet")
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    payload = _utils.generatePayload(soup, "m$Content$SaveButtonsRow$svbtn")
-    payload["__EVENTARGUMENT"] = ""
-    payload["__LASTFOCUS"] = ""
-    payload["m$searchinputfield"] = ""
-    payload["LectioPostbackId"] = ""
-    payload["m$Content$EditFolderName$tb"] = folderName
-    payload["m$Content$EditFolderComments"] = folderComment
-    payload["m$Content$FolderBox$ctl03"] = folderId
-
-    resp = self.session.post(f"https://www.lectio.dk/lectio/681/DokumentFolderRediger.aspx?parentfolderid={folderId}", data="&".join([f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}" for key, value in payload.items()]), allow_redirects=False)
-    if resp.status_code == 303:
-        return {"success": True}
-    else:
-        raise Exception("Oprettelsen af mappen var ikke succesfuld")
-
-
-
 def dokumenter(self, folderid=None):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}" if folderid == None else f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentOversigt.aspx?elevid={self.elevId}&folderid={folderid}"
     resp = self.session.get(url)
@@ -90,3 +66,92 @@ def dokumenter(self, folderid=None):
                 dokumenterDict["indhold"].append(filDict)
 
     return dokumenterDict
+
+def opretMappe(self, folderName, folderComment, folderId):
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/DokumentFolderRediger.aspx?parentfolderid={folderId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    payload = _utils.generatePayload(soup, "m$Content$SaveButtonsRow$svbtn")
+    payload["__EVENTARGUMENT"] = ""
+    payload["__LASTFOCUS"] = ""
+    payload["m$searchinputfield"] = ""
+    payload["LectioPostbackId"] = ""
+    payload["m$Content$EditFolderName$tb"] = folderName
+    payload["m$Content$EditFolderComments"] = folderComment
+    payload["m$Content$FolderBox$ctl03"] = folderId
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/681/DokumentFolderRediger.aspx?parentfolderid={folderId}", data="&".join([f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}" for key, value in payload.items()]), allow_redirects=False)
+    if resp.status_code == 303:
+        return {"success": True}
+    else:
+        raise Exception("Oprettelsen af mappen var ikke succesfuld")
+
+def dokumentHent(self, dokumentId):
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/dokumenthent.aspx?documentid={dokumentId}"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+
+    return resp.content
+
+def dokumentUpload(self, fileName, folderId, contentType, content, fileComment, public, documentId):
+    urlDokumentRediger = f"https://www.lectio.dk/lectio/{self.skoleId}/dokumentrediger.aspx?" + f"dokumentid={documentId}" if documentId else f"folderid={folderId}"
+    resp = self.session.get(urlDokumentRediger)
+    if resp.url != urlDokumentRediger:
+        raise Exception("lectio-cookie udløbet")
+    soupSubmit = BeautifulSoup(resp.text, "html.parser")
+
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/documentchoosercontent.aspx?year=2023&ispublic=0&showcheckbox=1&mode=pickfile"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soupFile = BeautifulSoup(resp.text, "html.parser")
+
+    payload = _utils.generatePayload(soupFile, "ctl00$Content$newfileOK")
+    payload["__LASTFOCUS"] = ""
+    payload["__EVENTARGUMENT"] = ""
+    payload["LectioPostbackId"] = ""
+
+    webKitFormBoundary = ""
+    for key, value in payload.items():
+        webKitFormBoundary += f'------WebKitFormBoundaryi4oxASAKjAOULyBa\nContent-Disposition: form-data; name="{key}"\n\n{value}\n'
+    webKitFormBoundary += f'------WebKitFormBoundaryi4oxASAKjAOULyBa\nContent-Disposition: form-data; name="ctl00$Content$fileUpload_up"; filename="{fileName}"\nContent-Type: {contentType}\n\n{content}\n------WebKitFormBoundaryi4oxASAKjAOULyBa--'
+
+    resp = self.session.post(f"https://www.lectio.dk/lectio/{self.skoleId}/documentchoosercontent.aspx?year=2023&ispublic=0&showcheckbox=1&mode=pickfile", data=webKitFormBoundary, headers={
+        "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryi4oxASAKjAOULyBa"
+    })
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+
+    serializedId = re.search('"serializedId":"\w+"', resp.text).group()[16:-1]
+    payload = _utils.generatePayload(soupSubmit, "m$Content$docChooser")
+    payload["__EVENTARGUMENT"] = "documentId"
+    payload["__LASTFOCUS"] = ""
+    payload["m$searchinputfield"] = ""
+    payload["m$Content$docChooser$selectedDocumentId"] = '{"type":"serializedAnyFileId","serializedId":"'+serializedId+'","isPublic":true,"filename":"' + fileName +'"}'
+    payload["m$Content$EditDocRelatedAddDD$inp"] = ""
+    payload["LectioPostbackId"] = ""
+
+    resp = self.session.post(urlDokumentRediger, data="&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items()), headers={
+        "content-type": "application/x-www-form-urlencoded"
+    })
+    soup = BeautifulSoup(resp.text, "html.parser")
+    payload = _utils.generatePayload(soup, "m$Content$SaveButtonsRow$svbtn")
+    payload["__EVENTARGUMENT"] = ""
+    payload["m$searchinputfield"] = ""
+    payload["m$Content$EditDocComments$tb"] = fileComment
+    payload["m$Content$AffiliationsGV$ctl02$FolderBox$ctl03"] = folderId
+    payload["m$Content$EditDocRelatedAddDD$inp"] = ""
+    payload["LectioPostbackId"] = ""
+    if documentId:
+        payload["m$Content$AffiliationsGV$ctl02$AllowEditCheckBox"] = "on"
+    if public: payload["m$Content$EditDocIsPublic"] = "on"
+
+    resp = self.session.post(urlDokumentRediger, data="&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items()))
+    if resp.url == f"https://www.lectio.dk/lectio/{self.skoleId}/default.aspx":
+        return {"success": True}
+    else:
+        raise Exception("Upload var ikke succesfuld")

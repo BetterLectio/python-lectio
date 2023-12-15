@@ -13,14 +13,6 @@ def generatePayload(soup, eventTarget):
 
     return payload
 
-#statusDictionary = {
-#    "s2normal": "normal",
-#    "s2cancelled": "aflyst",
-#    "s2changed": "ændret",
-#
-#    "s2bgboxeksamen": "eksamen"
-#}
-
 renameDictionary = {
     "Lærere": "Lærer",
     "Lokaler": "Lokale"
