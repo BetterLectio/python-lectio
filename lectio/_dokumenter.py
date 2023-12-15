@@ -98,7 +98,7 @@ def dokumentHent(self, dokumentId):
     return resp.content
 
 def dokumentUpload(self, fileName, folderId, contentType, content, fileComment, public, documentId):
-    urlDokumentRediger = f"https://www.lectio.dk/lectio/{self.skoleId}/dokumentrediger.aspx?" + f"dokumentid={documentId}" if documentId else f"folderid={folderId}"
+    urlDokumentRediger = f"https://www.lectio.dk/lectio/{self.skoleId}/dokumentrediger.aspx?" + (f"dokumentid={documentId}" if documentId else f"folderid={folderId}")
     resp = self.session.get(urlDokumentRediger)
     if resp.url != urlDokumentRediger:
         raise Exception("lectio-cookie udløbet")
