@@ -19,6 +19,32 @@ def informationer(self):
 
     return informationerDict
 
+def fåHoldMedlemmer(self, id):
+    url = f"https://www.lectio.dk/lectio/{self.skoleId}/subnav/members.aspx?holdelementid={id}&showteachers=1&showstudents=1"
+    resp = self.session.get(url)
+    if resp.url != url:
+        raise Exception("lectio-cookie udløbet")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    table = soup.find("table", {"id": "s_m_Content_Content_laerereleverpanel_alm_gv"})
+
+    headers = []
+    for header in table.find_all("th"):
+        headers.append(header.text.strip().lower())
+
+    medlemmer = []
+    for row in table.find_all("tr")[1:]:
+        data = row.find_all("td")
+        medlem = {}
+        for i in range(1, len(data)):
+            medlem[headers[i]] = data[i].text.strip()
+            if (brugerId := data[i].get("data-lectiocontextcard")):
+                medlem["bruger_id"] = brugerId
+        medlemmer.append(medlem)
+
+    return medlemmer
+
+
 def fåBruger(self, brugerId, hold_gruppe=True):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/contextcard/contextcard.aspx?lectiocontextcard={brugerId}"
     resp = self.session.get(url)

@@ -134,3 +134,6 @@ class sdk:
 
     def dokumentHent(self, dokumentId):
         return _dokumenter.dokumentHent(self, dokumentId)
+
+    def fåHoldMedlemmer(self, id):
+        return _informationer.fåHoldMedlemmer(self, id)
