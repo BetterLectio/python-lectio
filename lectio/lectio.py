@@ -132,8 +132,8 @@ class sdk:
     def dokumentUpload(self, fileName, folderId, contentType, content, fileComment="", public=False, documentId=None):
         return _dokumenter.dokumentUpload(self, fileName, folderId, contentType, content, fileComment, public, documentId)
 
-    def dokumentHent(self, dokumentId):
-        return _dokumenter.dokumentHent(self, dokumentId)
+    def dokumentHent(self, dokumentId, doctype=None):
+        return _dokumenter.dokumentHent(self, dokumentId, doctype)
 
     def fåHoldMedlemmer(self, id):
         return _informationer.fåHoldMedlemmer(self, id)

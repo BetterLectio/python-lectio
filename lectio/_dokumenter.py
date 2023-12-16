@@ -89,8 +89,9 @@ def opretMappe(self, folderName, folderComment, folderId):
     else:
         raise Exception("Oprettelsen af mappen var ikke succesfuld")
 
-def dokumentHent(self, dokumentId):
+def dokumentHent(self, dokumentId, doctype):
     url = f"https://www.lectio.dk/lectio/{self.skoleId}/dokumenthent.aspx?documentid={dokumentId}"
+    if doctype: url += f"&doctype={doctype}"
     resp = self.session.get(url)
     if resp.url != url:
         raise Exception("lectio-cookie udløbet")
