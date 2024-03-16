@@ -67,7 +67,7 @@ def skema(self, uge=None, år=None, id=None):
         raise Exception("lectio-cookie udløbet")
 
     soup = BeautifulSoup(resp.text, "html.parser")
-    årstal = soup.find("input", {"name": "s$m$Content$Content$SkemaNyMedNavigation$datePicker$tb"}).get("value").split(" ")[-1]
+    #årstal = soup.find("input", {"name": "s$m$Content$Content$SkemaNyMedNavigation$datePicker$tb"}).get("value").split(" ")[-1]
 
     skema["overskrift"] = soup.find("div", {"id": "s_m_HeaderContent_MainTitle"}).text
 
@@ -116,7 +116,7 @@ def skema(self, uge=None, år=None, id=None):
                 modulDict = _utils.skemaBrikExtract("", modul)
                 if not modulDict["tidspunkt"]:
                     top = re.search("top:[^;]+", modul.get("style")).group()[4:-2]
-                    modulDict["tidspunkt"] = soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + årstal + " " + modulTider[top]
+                    #modulDict["tidspunkt"] = soup.find("tr", {"class": "s2dayHeader"}).find_all("td")[i].text.split(" ")[1][1:-1].strip() + "-" + årstal + " " + modulTider[top]
                 skema["moduler"].append(modulDict)
         i += 1
 
