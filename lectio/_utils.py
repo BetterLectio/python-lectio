@@ -73,3 +73,6 @@ def skemaBrikExtract(dato, skemabrik):
         pass
 
     return modulDict
+
+def formEncode(payload):
+    return "&".join(f"{urllib.parse.quote(key)}={urllib.parse.quote(value).replace('%20', '+')}" for key, value in payload.items())

@@ -137,3 +137,6 @@ class sdk:
 
     def fåHoldMedlemmer(self, id):
         return _informationer.fåHoldMedlemmer(self, id)
+
+    def afleverOpgave(self, exerciseid, fileName, fileContentType, fileContent="", note=None):
+        return _opgaver.afleverOpgave(self, exerciseid, fileName, fileContentType, fileContent, note)

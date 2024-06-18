@@ -102,7 +102,7 @@ def dokumentHent(self, dokumentId, doctype):
         "content-disposition": resp.headers["content-disposition"],
     }
 
-def dokumentUpload(self, fileName, folderId, contentType, content, fileComment, public, documentId):
+def dokumentUpload(self, fileName, folderId, contentType, content, fileComment, public, documentId): # Todo: Omskriv
     urlDokumentRediger = f"https://www.lectio.dk/lectio/{self.skoleId}/dokumentrediger.aspx?" + (f"dokumentid={documentId}" if documentId else f"folderid={folderId}")
     resp = self.session.get(urlDokumentRediger)
     if resp.url != urlDokumentRediger:
